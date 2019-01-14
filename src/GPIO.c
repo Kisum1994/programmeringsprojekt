@@ -384,8 +384,9 @@ void TIM2_IRQHandler(void) {
     TIM2->SR &= ~0x0001; // Clear interrupt bit
  }
 
-int8_t get_char(char * text, int length) {
+int8_t get_char(char * text, int length/*, int* buffcount // dette kan bruges i stedet for en statisk variable, med initialisering i main af buffcount*/) {
 
+    static int buffCount; //Husk at forklare static variable i rapport
 
 
     if (buffCount<length) {
@@ -396,123 +397,82 @@ int8_t get_char(char * text, int length) {
         if (text[buffCount-1]==0x0d) {
             buffCount--;
             text[buffCount]=0x00;
-            return text;
+            buffCount = 0;
+            return 1;
             uart_clear();
         }
     }
     if(buffCount==length){
         text[buffCount]=0x00;
-        return text;
+        buffCount = 0;
+        return 1;
         uart_clear();
     }
+    return 0;
 }
 
-void PCtimer () {
-    printf("STOPWATCH.exe\n");
-    while(1) {
-        int input;
-        int i=0;
-        int j=1;
-        int k=0;
-        int l_old=0;
-            if (i!=j) {
-                while (1) {
-                    input=0;
-                    input=userInput();
-                    if (input==0x10) {
+void PCtimer (int * input) {
+
+                    if (input==0x10) {  // tænder ur
                         TIM2->CR1 = 0x0001;
-                        j=i;
-                        l_old=1;
-                        break;
+                        printf("Ur startet");
+
                     }
-                    else if (input==0x01) {
-                        i=0;
-                        j=1;
+
+                    if (input==0x01) {  // reseter ur
 
                         time=0;
                         s=0;
                         m=0;
                         h=0;
-                        //gotoxy(2,0);
-                        clreol();
                         printf("%02d.%02d.%02d\n",h,m,s);
-                        //gotoxy(2,0);
+                        printf("Ur reset");
                     }
-                    //else if (input==0x02) {
-                       // k=1;
-                        //break;
-                    //}
-                }
-            }
 
-            //if(k==1) {
-               // break;
-            //}
-
-            if (i==j) {
-                input=0;
-                //input=userInput();
-                    while (1) {
-                        if (uart_get_char()!=0) {
-                                input=userInput();
-                        }
-                        if (s!=s_) {
+                    if (s!=s_) { // printer tiden når uret er igang
                             printf("%02d.%02d.%02d\n",h,m,s);
-                            // gotoxy(2,0);
+
                             (s_)=(s);
-                            l_old=0;
-                        }
-                        if (input==0x08) {
-                            gotoxy(3,0);
-                            printf("Split 1: %02d.%02d.%02d\n",h,m,s);
-                            gotoxy(2,0);
-                            l_old=0;
-                            input=0;
-                        }
-                        if (input==0x04) {
-                           gotoxy(4,0);
-                           printf("Split 2: %02d.%02d.%02d\n",h,m,s);
-                           gotoxy(2,0);
-                           l_old=0;
-                           input=0;
-                        }
-                        if (input==0x10 && l_old==0) {
-                            TIM2->CR1 = 0x0000;
-                            i=0;
-                            j=1;
-                        break;
+
                     }
 
-                }
-            }
-    }
+                    if (input==0x08) { // split 1
+
+                            printf("Split 1: %02d.%02d.%02d\n",h,m,s);
+
+
+
+                    }
+
+                    if (input==0x04) { // split 2
+
+                           printf("Split 2: %02d.%02d.%02d\n",h,m,s);
+
+
+                    }
+
+                    if (input==0x20) { // stopper ur
+                            TIM2->CR1 = 0x0000;
+                            printf("Ur stopppet");
+                    }
 }
 
-int userInput() {
-
-    char str[21];
-
-    while(1) {
-        get_char(str,20);
+int userInput(char * str) {
 
         if (strcmp(str,"start")==0) {
             return 0x10;
-            break;
+
         } else if (strcmp(str,"stop")==0 ) {
-            return 0x10;
-            break;
+            return 0x20;
+
         } else if (strcmp(str,"split1" )==0) {
             return 0x08;
-            break;
+
         } else if (strcmp(str,"split2")==0 ) {
             return 0x04;
-            break;
+
         } else if (strcmp(str,"reset" )==0) {
             return 0x01;
-            break;
+
         }
-        else {
-            printf("Input not valid.\n");
-        }
-    }
 }

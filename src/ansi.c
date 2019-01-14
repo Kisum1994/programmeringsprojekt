@@ -150,9 +150,9 @@ void window(int x1,int y1, int x2, int y2,int style,char title[]) {
         }
     }
     gotoxy(x1,y1+2);
-    printf("%c",185);
-    printf(" %s ",title);
-    printf("%c",204);
+    //printf("%c",185);
+    //printf(" %s ",title);
+    //printf("%c",204);
     gotoxy(1,1);
 }
 
@@ -193,15 +193,14 @@ struct vector_t {
  };
 
 
-
+//erstat med to inputs -4 2
 //void initVector(struct vector_t *v) {
  //(*v).x = -4<<14;
  //(*v).y = 2<<14;
  //};
 
-int32_t rotatev(struct vector_t *v, int32_t deg) {
-(*v).x=FIX14_MULT((*v).x,calccos(deg))-FIX14_MULT((*v).y,calcsin(deg));
-(*v).y=FIX14_MULT((*v).x,calcsin(deg))+FIX14_MULT((*v).y,calccos(deg));
-return (*v).x, (*v).y;
-
+void rotatev(struct vector_t *v, int32_t deg) {
+    int32_t x=(*v).x;
+(*v).x=FIX14_MULT(x,calccos(deg))-FIX14_MULT((*v).y,calcsin(deg));
+(*v).y=FIX14_MULT(x,calcsin(deg))+FIX14_MULT((*v).y,calccos(deg));
 };
