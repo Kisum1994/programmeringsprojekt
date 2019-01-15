@@ -6,20 +6,19 @@
 #include "lut.h"
 
 #define ESC 0x1B
+// gloable varibler:  !skal være ens i startUP();
     int time;
     int s;
     int s_;
     int m;
     int h;
-    int buffCount=0;
 
-void startUP() {
+void startUP() { // initialisering af globale tidskonstanter. Skal bruges øverst i main.
     int time;
     int s;
     int s_;
     int m;
     int h;
-    int buffCount=0;
 }
 
 void initJoystick () {
@@ -262,34 +261,10 @@ void initTimer (){
  TIM2->SR &= ~0x0001; // Clear interrupt bit
  } */
 //----------------
-/* int8_t timerJoystick () {
 
-    uint16_t valUp = GPIOA->IDR & (0x0001 << 4);
-    uint16_t valNed = GPIOB->IDR & (0x0001 << 0);
-    uint16_t valCenter = GPIOB->IDR & (0x0001 << 5);
-    uint16_t valHojre = GPIOC->IDR & (0x0001 << 0);
-    uint16_t valVenstre = GPIOC->IDR & (0x0001 << 1);
 
-        if (valUp > 0) {
-            return  0x01;
-        }
-        else if (valNed > 0) {
-            return  0x02;
-        }
-        else if (valCenter > 0) {
-            return  0x10;
-        }
-        else if (valHojre > 0) {
-            return  0x08;
-        }
-        else if (valVenstre > 0) {
-            return  0x04;
-        } else {
-            return  0x00;
-        }
-} */
 
-void timer () {
+void timer () {  //OUTDATED, trapper bruger i et while loop
     while(1) {
 
         int i=0;
@@ -362,7 +337,7 @@ void timer () {
     }
 }
 
-void TIM2_IRQHandler(void) {
+void TIM2_IRQHandler(void) { // Denne funktion beskriver hvad der sker ved interrupt af timer2
 
 
         //Do whatever you want here, but make sure it doesn’t take too much time!
@@ -381,12 +356,26 @@ void TIM2_IRQHandler(void) {
             }
     }
     time++;
-    TIM2->SR &= ~0x0001; // Clear interrupt bit
+    TIM2->SR &= ~0x0001; // Clear interrupt bit, skal gøre for at kunne bruge interrupt igen.
  }
 
-int8_t get_char(char * text, int length/*, int* buffcount // dette kan bruges i stedet for en statisk variable, med initialisering i main af buffcount*/) {
+ int8_t get_char(char * text, int length/*, int* buffcount // dette kan bruges i stedet for en statisk variable, med initialisering i main af buffcount*/) {
 
-    static int buffCount; //Husk at forklare static variable i rapport
+    /* INDSÆT SÅLEDES I MAIN: HVIS MAN VIL PRINTE DEN INDTASTEDE STRING. !man behøver ikke at printe stringen!
+    Der defineres en string  str[length+1] main som man "overskriver" ved hjælp af get_char når get_char har ændret str vil den returne 1
+
+    uart_clear();
+    char str[4];
+
+    while (1) {
+
+        if (get_char(str, 3)>0) {
+            printf("%s",str);
+        }
+    }*/
+
+
+    static int buffCount=0; //Husk at forklare static variable i rapport
 
 
     if (buffCount<length) {
@@ -411,16 +400,13 @@ int8_t get_char(char * text, int length/*, int* buffcount // dette kan bruges i 
     return 0;
 }
 
-void PCtimer (int * input) {
-
+void PCtimer (int * input) { // stopur der kan kontrolleres med get_char og userInput funktionerne
                     if (input==0x10) {  // tænder ur
                         TIM2->CR1 = 0x0001;
                         printf("Ur startet");
-
                     }
 
                     if (input==0x01) {  // reseter ur
-
                         time=0;
                         s=0;
                         m=0;
@@ -429,26 +415,20 @@ void PCtimer (int * input) {
                         printf("Ur reset");
                     }
 
-                    if (s!=s_) { // printer tiden når uret er igang
+                    if (s!=s_) { // printer tiden når uret "tikker".
                             printf("%02d.%02d.%02d\n",h,m,s);
 
                             (s_)=(s);
-
                     }
 
                     if (input==0x08) { // split 1
 
                             printf("Split 1: %02d.%02d.%02d\n",h,m,s);
-
-
-
                     }
 
                     if (input==0x04) { // split 2
 
                            printf("Split 2: %02d.%02d.%02d\n",h,m,s);
-
-
                     }
 
                     if (input==0x20) { // stopper ur
@@ -457,11 +437,11 @@ void PCtimer (int * input) {
                     }
 }
 
-int userInput(char * str) {
+int userInput(char * str) { // til keyboard styring af PCtimer();
+    // brug den som input til PCtimer(); i et while loop i main
 
         if (strcmp(str,"start")==0) {
             return 0x10;
-
         } else if (strcmp(str,"stop")==0 ) {
             return 0x20;
 
@@ -473,6 +453,74 @@ int userInput(char * str) {
 
         } else if (strcmp(str,"reset" )==0) {
             return 0x01;
-
         }
 }
+
+
+int8_t keyboardInput(char * text) {
+    // fungerer som get_char(); men har en grænse på 3 karakterer for piletasterne
+
+    static int buffCount=0; //Husk at forklare static variable i rapport
+
+
+    if (buffCount<3) {
+        if (0<uart_get_count()) {
+            text[buffCount]=uart_get_char();
+            buffCount++;
+
+        }
+        if (text[buffCount-1]==0x0d) {
+
+            text[buffCount]=0x00;
+            buffCount = 0;
+            return 1;
+            uart_clear();
+        }
+        else if (text[buffCount-1]==0x20) {
+
+            text[buffCount]=0x00;
+            buffCount = 0;
+            return 1;
+            uart_clear();
+        }
+    }
+     if(buffCount==3){
+
+        buffCount = 0;
+        return 1;
+        uart_clear();
+
+        }
+return 0;
+}
+
+
+
+
+int arrowInput(char * str) {
+
+        if (str[2]==65) { //pil op
+            return 0x10;
+            str[2]=0x00;
+        }
+        if (str[2]==66) { // pil ned
+            return 0x20;
+            str[2]=0x00;
+        }
+        if (str[2]==67) { // pil højre
+            return 0x08;
+            str[2]=0x00;
+        }
+        if (str[2]==68) { // pil venstre
+            return 0x04;
+            str[2]=0x00;
+        }
+
+        if (str[0]==0x20) { //mellemrum
+            return 0x01;
+        }
+        if (str[0]==0x0d) { //enter
+            return 0x30;
+        }
+}
+
