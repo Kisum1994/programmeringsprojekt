@@ -1,9 +1,12 @@
-
+#include "30010_io.h"
+#include "stm32f30x_conf.h"
 #include "ansi.h"
 #include "lut.h"
 #define ESC 0x1B
 #define FIX14_SHIFT 14
 #define FIX14_MULT(a, b) ( (a)*(b) >> FIX14_SHIFT )
+#include "charset.h"
+#include <string.h>
 
 
 void fgcolor(int foreground) {
@@ -33,7 +36,6 @@ void bgcolor(int background) {
                 the colors are initially like that, but when the background color is first changed there is no
  	              way comming back.
    Hint:        Use resetbgcolor(); clrscr(); to force HyperTerminal into gray text on black background.
-
     Value      Color
     ------------------
       0        Black
@@ -150,9 +152,9 @@ void window(int x1,int y1, int x2, int y2,int style,char title[]) {
         }
     }
     gotoxy(x1,y1+2);
-    //printf("%c",185);
-    //printf(" %s ",title);
-    //printf("%c",204);
+    printf("%c",185);
+    printf(" %s ",title);
+    printf("%c",204);
     gotoxy(1,1);
 }
 
@@ -174,13 +176,12 @@ int32_t expand(int32_t i) {
  return i << 2;
  }
 
- void fix(int32_t i){
+ /*void fix(int32_t i){
  printFix(expand(i));
  }
 int32_t calcsin(int deg)
-{
-int32_t input = (deg*512)/360;
-return (int32_t)(sinus[input&0x1FF]);
+int32_t input = (deg*512)/360;*/
+/*return (int32_t)(sinus[input&0x1FF]);
 }
 int32_t calccos(int deg)
 {
@@ -193,14 +194,84 @@ struct vector_t {
  };
 
 
-//erstat med to inputs -4 2
+
 //void initVector(struct vector_t *v) {
  //(*v).x = -4<<14;
  //(*v).y = 2<<14;
  //};
 
-void rotatev(struct vector_t *v, int32_t deg) {
-    int32_t x=(*v).x;
-(*v).x=FIX14_MULT(x,calccos(deg))-FIX14_MULT((*v).y,calcsin(deg));
-(*v).y=FIX14_MULT(x,calcsin(deg))+FIX14_MULT((*v).y,calccos(deg));
-};
+int32_t rotatev(struct vector_t *v, int32_t deg) {
+(*v).x=FIX14_MULT((*v).x,calccos(deg))-FIX14_MULT((*v).y,calcsin(deg));
+(*v).y=FIX14_MULT((*v).x,calcsin(deg))+FIX14_MULT((*v).y,calccos(deg));
+return (*v).x, (*v).y;
+
+};*/
+void menu(void){
+    char menu_option;
+
+    printf("        Clock timer menu\n");
+    printf("------------------------------------------\n\n");
+
+
+    printf("Main Menu\n");
+    printf("Start the stopwatch by typing start.\n");
+    printf("Stop the stopwatch by typing stop.\n");
+    printf("Take splittime 1 by typing split1.\n");
+    printf("Take splittime 2 by typing split2.\n");
+    printf("Reset stopwatch time by typing reset.\n");
+    printf("Get help by typing help.\n");
+    printf(" Please type an option from the main menu: ");
+
+
+
+    switch(menu_option){
+
+    case 0x10:
+
+        break;
+    case 'm' :
+
+        break;
+    case'c':
+
+        break;
+    case'd':
+        break;
+    case 0x01:
+
+        break;
+    case'f':
+        /* display help message */
+        break;
+    default:
+        printf("invalid input");
+            break;
+    }
+    }
+
+
+void lcd_write_string(uint8_t * buffer, char * str,int location){
+    int i=0;
+    int j=0;
+
+    while (str[i]!=0x00) {
+            for (j=0;j<5;j++) {
+                buffer[(i*5+j)+location] = character_data[str[i]-0x20][j];
+            }
+            i++;
+    }
+}
+
+void lcd_update(uint8_t * buffer, char * str){
+
+    static int i=0;
+    static int j=0;
+    if (i==50) {
+        lcd_write_string(buffer,str,j);
+        i-=50;
+        j++;
+    }
+    i++;
+}
+
+

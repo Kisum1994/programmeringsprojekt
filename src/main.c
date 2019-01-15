@@ -9,7 +9,6 @@
    Last changed by:    $Author: $
    Last changed date:  $Date:  $
    ID:                 $Id:  $
-
 **********************************************************************/
 
 
@@ -20,129 +19,91 @@
 #include "charset.h"
 #include "lut.h"
 
-//der er lige nu fejl i koden men dettte kan ændres ved at implementere den rigtige brug af pointers
-struct velocityvector{int32_t x;int32_t y;int32_t vx;int32_t vy};
-void updateVelocityVector(struct velocityvector velovector){
-velovector.x=velovector.x+velovector.vx;
-velovector.y=velovector.y+velovector.vy;
-};
-void makeball(int32_t x, int32_t y){
-gotoxy(x,y);
-printf("o");
-}
-
-void moveBall(struct velocityvector velovector){
-   int32_t xo:
-   int32_t yo;
-updateVelocityVector(velovector);
-makeball(velovector.x,velovector.y);
-xo=velovector.x-velovector.vx;
-yo=velovector.y-velovector.vy;
-gotoxy(xo,yo);
-printf("");
-};
-
-int degY(struct velocityvector velovector){
-int degree;
-degree=abs(velovector.y-velovector.vy)
-}
-
-bool detectBarrier( int x1, int y1, int x2, int y2, struct velocityvector velovector){
-    if(velovector.x+velovector.vx=<x1 && velovector.y+velovector.vy>0){
-            if(){
-
-            }
-            else if(){
-
-            }
-    }
-    else if (velovector.x+velovector.vx==x2){
-            if(){
-
-            }
-            else if(){
-
-            }
-    }
-    else if (velovector.y+velovector.vy==y1){
-            if(){
-
-            }
-            else if(){
-
-            }
-    }
-    else if (velovector.y+velovector.vy==y2){
-            if(){
-
-            }
-            else if(){
-
-            }
-    }
-
-}
-
-
+    int time;
+    int s;
+    int s_;
+    int m;
+    int h;
 
 int main(void) {
     uart_init( 9600 ); //initialize USB serial emulation at 9600 baud
-    //startUP();
-    //initJoystick();
-    //lcd_init();
-    //initTimer();
+    // Start globale variable
+    // startUP();
+    printf("\e[?25l");
+    lcd_init();
+    int flag=0;
+    initTimer();
+    TIM2->CR1=0x0001;
+    TIM2_IRQHandler();
 
     //initLED();
 
-    //clrscr();
-    clrscr();
-    window(3,4,20,20,1,"test");
-    struct velocityvector bold;
-    bold.x=5;
-    bold.y=5;
-    bold.vx=1;
-    bold.vy=1;
-while(1){
-    moveBall(bold);
-}
 
-    //initTimer();
-        // TIM2->CR1 = 0x0001; <-- start timer 2
-    //TIM2_IRQHandler();
 
-/*
+
+
+
     //  Her starter kode til 6.2
+    char str[]="Ida er leakker";
+
+
     int8_t buffer[512];
-    memset(buffer,0xAA,512);
-    //int i;
-    //for (i=0; i<=512; i++){
-    //buffer[i]= 0xaa;
-    //};
+    memset(buffer,0x00,512);
+
+    lcd_write_string(buffer,str,0);
+
     lcd_push_buffer(buffer);
+
         //char str[21];
     //str[2]="2";
     //PCtimer();
-    printf("test ");
-    char str[21];
-    int input=0;
-    //int i=0;
-    //int j=1;
-    printf("STOPWATCH.exe\n");
-    while(1){
-        //for(int i=0;i<20;i++){
-        //        str[i]="";
-        //}
-        if (get_char(str,20)==1){
-            input=userInput(str);
+    clrscr();
 
+    // første koordinat nedad og 2 koordinat til siden
+    int k=0;
+    int g=0;
+    int position=4;
+    // tegn rumhavmåger
+    while (1){
+
+        if (time%10==0){
+        //tegn stor asteroide
+            drawAsteroide(5,position+5,0);
+            CleanAsteroide(5, 0, position+5, 1, 0);
+        // tegn lille asteroide
+            drawAsteroide(10,position+7,1);
+            CleanAsteroide(10, 0, position+7, 1, 1);
+        // tegn flyvende rumhavmåge
+            if (g<2){
+                drawSeagull(position,position,k);
+                CleanSeagull(position,1,position,1,k);
+                if (k==0){
+                    k=1;
+                    position++;
+                }
+                else if (k==1){
+                    k=0;
+                }
+            }
         }
-        if(input>0){
-        printf("%d",input);
+        if (time%60==0){
+            g++;
+                if (g==2){
+                    deleteSeagull(position,1,position,1);
+                }
         }
-        PCtimer(input);
-        input=0;
     }
-    printf("%s",str);
-*/
+
+    // skriv den tomme ldc_update fil
+
+    // først skal der laves en funktion lcd_write_string()
+     while (1) {
+        if (flag=1) {
+            lcd_update(buffer,str);
+            lcd_push_buffer(buffer);
+            flag=0;
+        }
+    }
+
   while(1) {}
 }

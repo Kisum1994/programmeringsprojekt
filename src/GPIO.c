@@ -11,7 +11,7 @@
     int s_;
     int m;
     int h;
-    int buffCount=0;
+
 
 void startUP() {
     int time;
@@ -19,7 +19,7 @@ void startUP() {
     int s_;
     int m;
     int h;
-    int buffCount=0;
+
 }
 
 void initJoystick () {
@@ -74,7 +74,6 @@ int8_t readJoystick () {
     int i;
     while (1){
         readJoystick();
-
     }
     */
 
@@ -196,7 +195,6 @@ void LEDjoystick() {
     int i;
     while (1){
         LEDjoystick();
-
     }
     */
 
@@ -253,41 +251,6 @@ void initTimer (){
 // // TIM2->CR1 = 0x0001; --- start timer 2 -- skriv dette i main for at starte timeren
 }
 
- /* void TIM2_IRQHandler(void) {
-        //Do whatever you want here, but make sure it doesn’t take too much time!
-        // OMREGN TIL SEKUNDER! fra 1/100 dele s
-    time++;
-    printf("%d\n",time);
-
- TIM2->SR &= ~0x0001; // Clear interrupt bit
- } */
-//----------------
-/* int8_t timerJoystick () {
-
-    uint16_t valUp = GPIOA->IDR & (0x0001 << 4);
-    uint16_t valNed = GPIOB->IDR & (0x0001 << 0);
-    uint16_t valCenter = GPIOB->IDR & (0x0001 << 5);
-    uint16_t valHojre = GPIOC->IDR & (0x0001 << 0);
-    uint16_t valVenstre = GPIOC->IDR & (0x0001 << 1);
-
-        if (valUp > 0) {
-            return  0x01;
-        }
-        else if (valNed > 0) {
-            return  0x02;
-        }
-        else if (valCenter > 0) {
-            return  0x10;
-        }
-        else if (valHojre > 0) {
-            return  0x08;
-        }
-        else if (valVenstre > 0) {
-            return  0x04;
-        } else {
-            return  0x00;
-        }
-} */
 
 void timer () {
     while(1) {
@@ -368,6 +331,7 @@ void TIM2_IRQHandler(void) {
         //Do whatever you want here, but make sure it doesn’t take too much time!
         // OMREGN TIL SEKUNDER! fra 1/100 dele sek
         // dette er hvad der sker ved en interrupt i timer 2
+
     if (time>=100) {
             s++;
             time -= 100;
@@ -381,13 +345,13 @@ void TIM2_IRQHandler(void) {
             }
     }
     time++;
+    int flag=1;
     TIM2->SR &= ~0x0001; // Clear interrupt bit
  }
 
-int8_t get_char(char * text, int length/*, int* buffcount // dette kan bruges i stedet for en statisk variable, med initialisering i main af buffcount*/) {
+int8_t get_char(char * text, int length) {
 
-    static int buffCount; //Husk at forklare static variable i rapport
-
+static int buffCount=0;
 
     if (buffCount<length) {
         if (0<uart_get_count()) {
@@ -397,82 +361,286 @@ int8_t get_char(char * text, int length/*, int* buffcount // dette kan bruges i 
         if (text[buffCount-1]==0x0d) {
             buffCount--;
             text[buffCount]=0x00;
-            buffCount = 0;
-            return 1;
+            return text;
             uart_clear();
         }
     }
     if(buffCount==length){
         text[buffCount]=0x00;
-        buffCount = 0;
-        return 1;
+        return text;
         uart_clear();
     }
-    return 0;
 }
 
-void PCtimer (int * input) {
-
-                    if (input==0x10) {  // tænder ur
+void PCtimer () {
+    printf("STOPWATCH.exe\n");
+    while(1) {
+        int input;
+        int i=0;
+        int j=1;
+        int k=0;
+        int l_old=0;
+            if (i!=j) {
+                while (1) {
+                    input=0;
+                    input=userInput();
+                    if (input==0x10) {
                         TIM2->CR1 = 0x0001;
-                        printf("Ur startet");
-
+                        j=i;
+                        l_old=1;
+                        break;
                     }
-
-                    if (input==0x01) {  // reseter ur
+                    else if (input==0x01) {
+                        i=0;
+                        j=1;
 
                         time=0;
                         s=0;
                         m=0;
                         h=0;
+                        //gotoxy(2,0);
+                        clreol();
                         printf("%02d.%02d.%02d\n",h,m,s);
-                        printf("Ur reset");
+                        //gotoxy(2,0);
                     }
+                    //else if (input==0x02) {
+                       // k=1;
+                        //break;
+                    //}
+                }
+            }
 
-                    if (s!=s_) { // printer tiden når uret er igang
+            //if(k==1) {
+               // break;
+            //}
+
+            if (i==j) {
+                input=0;
+                //input=userInput();
+                    while (1) {
+                        if (uart_get_char()!=0) {
+                                input=userInput();
+                        }
+                        if (s!=s_) {
                             printf("%02d.%02d.%02d\n",h,m,s);
-
+                            // gotoxy(2,0);
                             (s_)=(s);
-
-                    }
-
-                    if (input==0x08) { // split 1
-
+                            l_old=0;
+                        }
+                        if (input==0x08) {
+                            gotoxy(3,0);
                             printf("Split 1: %02d.%02d.%02d\n",h,m,s);
-
-
-
-                    }
-
-                    if (input==0x04) { // split 2
-
+                            gotoxy(2,0);
+                            l_old=0;
+                            input=0;
+                        }
+                        if (input==0x04) {
+                           gotoxy(4,0);
                            printf("Split 2: %02d.%02d.%02d\n",h,m,s);
-
-
-                    }
-
-                    if (input==0x20) { // stopper ur
+                           gotoxy(2,0);
+                           l_old=0;
+                           input=0;
+                        }
+                        if (input==0x10 && l_old==0) {
                             TIM2->CR1 = 0x0000;
-                            printf("Ur stopppet");
+                            i=0;
+                            j=1;
+                        break;
                     }
+
+                }
+            }
+    }
 }
 
-int userInput(char * str) {
+int userInput() {
+
+    char str[21];
+
+    while(1) {
+        get_char(str,20);
 
         if (strcmp(str,"start")==0) {
             return 0x10;
-
+            break;
         } else if (strcmp(str,"stop")==0 ) {
-            return 0x20;
-
+            return 0x10;
+            break;
         } else if (strcmp(str,"split1" )==0) {
             return 0x08;
-
+            break;
         } else if (strcmp(str,"split2")==0 ) {
             return 0x04;
-
+            break;
         } else if (strcmp(str,"reset" )==0) {
             return 0x01;
+            break;
+        }
+        else {
+            printf("Input not valid.\n");
+        }
+    }
+}
 
+
+// funktion til at tegne en måge i bevægelse.
+void drawSeagull(int x, int y, int k){
+    x=x-1;
+    y=y-4;
+        if (k==0){
+            gotoxy(x,y);
+            // måge position står
+            printf("%c%c%c%c%c%c%c%c%c",' ',' ',47,92,' ',47,92,' ',' ');
+            gotoxy(x+1,y);
+            printf("%c%c%c%c%c%c%c%c%c",' ',35,' ',' ',153,' ',' ',35,' ');
+            gotoxy(x+2,y);
+            printf("%c%c%c%c%c%c%c%c%c",' ', 118,' ',' ',35,' ',' ',118,' ');
+        }
+        else if (k==1){
+            // måge position flyver
+            gotoxy(x,y);
+            printf("%c%c%c%c%c%c%c%c%c",' ',47,35,92,' ',47,35,92,' ');
+            gotoxy(x+1,y);
+            printf("%c%c%c%c%c%c%c%c%c",35,' ',' ',' ',153,' ',' ',' ',35);
+            gotoxy(x+2,y);
+            printf("%c%c%c%c%c%c%c%c%c", 118,' ',' ',' ',35,' ',' ',' ',118);
         }
 }
+
+void deleteSeagull(int x, int vx, int y, int vy){
+x=x-vx-1;
+y=y-vy-4;
+        gotoxy(x,y);
+        printf("%*c",9,' ');
+        gotoxy(x+1,y);
+        printf("%*c",9,' ');
+        gotoxy(x+2,y);
+        printf("%*c",9,' ');
+}
+
+// input skal laves om til at tage en struct. Funktion til at clear rumhavmåge path.
+void CleanSeagull(int x, int32_t vx, int y, int32_t vy,int k){
+            if (y-vy<y){
+                    //mågen bevæger sig i positiv y-putty retning (positiv x-retning)
+                //skal være 1 større, da den har bevæget sig 1 plads i y.
+                y=y-1;
+            }
+            else if (y-vy>y){
+                //mågen bevæger sig i negativ x-retning (y_putty)
+                y=y+1;
+            }
+            if (x-vx<x){
+                //Afstanden fra massemidpunkt til start tegneposition - 1 ekstra i x, da den bevæger sig denne vej.
+                x=x-2;
+                y=y-3;
+            }
+            else if (x-vx>x){
+                //Afstanden fra massemidpunkt til start tegneposition + 1 ekstra i x, da den bevæger sig denne vej.
+                x=x+2;
+                y-=3;
+
+            }
+
+        gotoxy(x,y);
+        printf("%*c",7,' ');
+}
+
+void drawAsteroide(int x, int y, int size_A){
+        if (size_A==0){
+            x=x-1;
+            y=y-2;
+            gotoxy(x,y);
+            // Asteroide size stor
+            printf("%c%c%c%c%c",' ',35,35,35,' ');
+            gotoxy(x+1,y);
+            printf("%c%c%c%c%c",35,35,35,35,35);
+            gotoxy(x+2,y);
+            printf("%c%c%c%c%c",' ',35,35,35,' ');
+        }
+        else if (size_A==1){
+            y=y-1;
+            gotoxy(x,y);
+            // Asteroide size lille
+            printf("%c%c%c",35,35,35);
+        }
+}
+
+void CleanAsteroide(int x, int vx, int y, int vy, int size_A){
+int xold=x-vx;
+int yold=y-vy;
+        if (size_A==0){
+            if (vy>0){
+                //Asteroiden bevæger sig i positiv y-putty retning (positiv x-retning)
+                //skal være 1 mindre end afstand fra massemidtpunkt, da den har bevæget sig 1 plads i y.
+                y=yold-2;
+                x=xold-1;
+                // print blank
+                gotoxy(x,y);
+                printf("%c",' ');
+                gotoxy(x+1,y);
+                printf("%c",' ');
+                gotoxy(x+2,y);
+                printf("%c",' ');
+            }
+            else if (vy<0){
+                //Asteroiden bevæger sig i negativ x-retning (y_putty) y skal være 1 større end afstand fra massemidtpunkt.
+                y=yold+2;
+                x=xold-1;
+                // print blank
+                gotoxy(x,y);
+                printf("%c",' ');
+                gotoxy(x+1,y);
+                printf("%c",' ');
+                gotoxy(x+2,y);
+                printf("%c",' ');
+            }
+            if (vx>0){
+                //Asteroiden bevæger sig i positiv x-putty retning (positiv y-retning)
+                x=xold-1;
+                y=yold-2;
+                gotoxy(x,y);
+                printf("%*c",5,' ');
+            }
+            else if (vx<0){
+            //Afstanden fra massemidpunkt til start tegneposition + 1 ekstra i x, da den bevæger sig denne vej.
+                x=xold+1;
+                y=yold-2;
+                gotoxy(x,y);
+            printf("%*c",5,' ');
+            }
+        }
+
+        else if (size_A==1){
+            if (vy>0){
+                    //Asteroiden bevæger sig i positiv y-putty retning (positiv x-retning)
+                    //y skal være 1 mindre end afstand fra massemidtpunkt, da den har bevæget sig 1 plads i y.
+                    x=xold;
+                    y=yold-1;
+                    gotoxy(x,y);
+                    printf("%c",' ');
+                }
+            else if (vy<0){
+                    // Her bliver x og y til x og y
+                    x=xold;
+                    y=yold+1;
+                    gotoxy(x,y);
+                    printf("%c",' ');
+                }
+            if (vx>0){
+                //Asteroiden bevæger sig i positiv x-putty retning (positiv y-retning)
+                //x skal være 1 mindre end afstand fra massemidtpunkt, da den har bevæget sig 1 plads i positiv x.
+                x=xold;
+                y=yold-1;
+                gotoxy(x,y);
+                printf("%*c",3,' ');
+            }
+            else if (vx<0){
+                //Asteroiden bevæger sig i negativ x-retning (y_putty) x skal være 1 større end afstand fra massemidtpunkt.
+                x=xold;
+                y=yold-1;
+            gotoxy(x,y);
+            printf("%*c",3,' ');
+            }
+        }
+}
+

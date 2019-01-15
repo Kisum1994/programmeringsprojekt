@@ -10,7 +10,6 @@
 
 
 /*** Supported ASCII characters ***
-
 ASCII	CHAR	ASCII	CHAR	ASCII	CHAR	ASCII	CHAR	ASCII	CHAR	ASCII	CHAR
  0x20        0x30  0     0x40  @     0x50  P     0x60  `     0x70  p
  0x21  !     0x31  1     0x41  A     0x51  Q     0x61  a     0x71  q
@@ -28,11 +27,9 @@ ASCII	CHAR	ASCII	CHAR	ASCII	CHAR	ASCII	CHAR	ASCII	CHAR	ASCII	CHAR
  0x2D  -     0x3D  =     0x4D  M     0x5D  ]     0x6D  m     0x7D  }
  0x2E  .     0x3E  >     0x4E  N     0x5E  ^     0x6E  n     0x7E  ~
  0x2F  /     0x3F  ?     0x4F  O     0x5F  _     0x6F  o
-
 Note:
 1. The ASCII character 0x20 is "SPACE" or a blank.
 2. The ASCII character 0x7F(DEL) is not supported by the matrix below.
-
 */
 
 #ifndef _CHARSET_H_
