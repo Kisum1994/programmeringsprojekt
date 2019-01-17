@@ -6,12 +6,16 @@
 
 // initStructs funktionerne
 
-struct velocityvector{
+ struct velocityvector{
         int32_t x;
         int32_t y;
         int32_t vx;
         int32_t vy;
         int ang;
+        int alive;
+        int ani;
+        int width;
+        int height;
     };
 
     struct box{
@@ -22,10 +26,6 @@ struct velocityvector{
         char title[10];
         int style;
     };
-
-
-
-
 
 
 

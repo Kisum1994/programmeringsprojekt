@@ -516,7 +516,7 @@ int arrowInput(char * str) {
             str[2]=0x00;
         }
 
-        if (str[0]==0x20) { //mellemrum
+         if (str[0]==0x20) { //mellemrum
             return 0x01;
         }
         if (str[0]==0x0d) { //enter
