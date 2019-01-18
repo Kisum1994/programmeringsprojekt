@@ -483,164 +483,34 @@ int userInput() {
 }
 
 
-// funktion til at tegne en måge i bevægelse.
-void drawSeagull(int x, int y, int k){
-    x=x-1;
-    y=y-4;
-        if (k==0){
-            gotoxy(x,y);
-            // måge position står
-            printf("%c%c%c%c%c%c%c%c%c",' ',' ',47,92,' ',47,92,' ',' ');
-            gotoxy(x+1,y);
-            printf("%c%c%c%c%c%c%c%c%c",' ',35,' ',' ',153,' ',' ',35,' ');
-            gotoxy(x+2,y);
-            printf("%c%c%c%c%c%c%c%c%c",' ', 118,' ',' ',35,' ',' ',118,' ');
+
+
+
+int arrowInput(char * str) {
+
+        if (str[2]==65) { //pil op
+            return 0x10;
+            str[2]=0x00;
         }
-        else if (k==1){
-            // måge position flyver
-            gotoxy(x,y);
-            printf("%c%c%c%c%c%c%c%c%c",' ',47,35,92,' ',47,35,92,' ');
-            gotoxy(x+1,y);
-            printf("%c%c%c%c%c%c%c%c%c",35,' ',' ',' ',153,' ',' ',' ',35);
-            gotoxy(x+2,y);
-            printf("%c%c%c%c%c%c%c%c%c", 118,' ',' ',' ',35,' ',' ',' ',118);
+        if (str[2]==66) { // pil ned
+            return 0x20;
+            str[2]=0x00;
         }
-}
-
-void deleteSeagull(int x, int vx, int y, int vy){
-x=x-vx-1;
-y=y-vy-4;
-        gotoxy(x,y);
-        printf("%*c",9,' ');
-        gotoxy(x+1,y);
-        printf("%*c",9,' ');
-        gotoxy(x+2,y);
-        printf("%*c",9,' ');
-}
-
-// input skal laves om til at tage en struct. Funktion til at clear rumhavmåge path.
-void CleanSeagull(int x, int32_t vx, int y, int32_t vy,int k){
-            if (y-vy<y){
-                    //mågen bevæger sig i positiv y-putty retning (positiv x-retning)
-                //skal være 1 større, da den har bevæget sig 1 plads i y.
-                y=y-1;
-            }
-            else if (y-vy>y){
-                //mågen bevæger sig i negativ x-retning (y_putty)
-                y=y+1;
-            }
-            if (x-vx<x){
-                //Afstanden fra massemidpunkt til start tegneposition - 1 ekstra i x, da den bevæger sig denne vej.
-                x=x-2;
-                y=y-3;
-            }
-            else if (x-vx>x){
-                //Afstanden fra massemidpunkt til start tegneposition + 1 ekstra i x, da den bevæger sig denne vej.
-                x=x+2;
-                y-=3;
-
-            }
-
-        gotoxy(x,y);
-        printf("%*c",7,' ');
-}
-
-void drawAsteroide(int x, int y, int size_A){
-        if (size_A==0){
-            x=x-1;
-            y=y-2;
-            gotoxy(x,y);
-            // Asteroide size stor
-            printf("%c%c%c%c%c",' ',35,35,35,' ');
-            gotoxy(x+1,y);
-            printf("%c%c%c%c%c",35,35,35,35,35);
-            gotoxy(x+2,y);
-            printf("%c%c%c%c%c",' ',35,35,35,' ');
+        if (str[2]==67) { // pil højre
+            return 0x08;
+            str[2]=0x00;
         }
-        else if (size_A==1){
-            y=y-1;
-            gotoxy(x,y);
-            // Asteroide size lille
-            printf("%c%c%c",35,35,35);
+        if (str[2]==68) { // pil venstre
+            return 0x04;
+            str[2]=0x00;
+        }
+
+        if (str[0]==0x20) { //mellemrum
+            return 0x01;
+        }
+        if (str[0]==0x0d) { //enter
+            return 0x30;
         }
 }
 
-void CleanAsteroide(int x, int vx, int y, int vy, int size_A){
-int xold=x-vx;
-int yold=y-vy;
-        if (size_A==0){
-            if (vy>0){
-                //Asteroiden bevæger sig i positiv y-putty retning (positiv x-retning)
-                //skal være 1 mindre end afstand fra massemidtpunkt, da den har bevæget sig 1 plads i y.
-                y=yold-2;
-                x=xold-1;
-                // print blank
-                gotoxy(x,y);
-                printf("%c",' ');
-                gotoxy(x+1,y);
-                printf("%c",' ');
-                gotoxy(x+2,y);
-                printf("%c",' ');
-            }
-            else if (vy<0){
-                //Asteroiden bevæger sig i negativ x-retning (y_putty) y skal være 1 større end afstand fra massemidtpunkt.
-                y=yold+2;
-                x=xold-1;
-                // print blank
-                gotoxy(x,y);
-                printf("%c",' ');
-                gotoxy(x+1,y);
-                printf("%c",' ');
-                gotoxy(x+2,y);
-                printf("%c",' ');
-            }
-            if (vx>0){
-                //Asteroiden bevæger sig i positiv x-putty retning (positiv y-retning)
-                x=xold-1;
-                y=yold-2;
-                gotoxy(x,y);
-                printf("%*c",5,' ');
-            }
-            else if (vx<0){
-            //Afstanden fra massemidpunkt til start tegneposition + 1 ekstra i x, da den bevæger sig denne vej.
-                x=xold+1;
-                y=yold-2;
-                gotoxy(x,y);
-            printf("%*c",5,' ');
-            }
-        }
-
-        else if (size_A==1){
-            if (vy>0){
-                    //Asteroiden bevæger sig i positiv y-putty retning (positiv x-retning)
-                    //y skal være 1 mindre end afstand fra massemidtpunkt, da den har bevæget sig 1 plads i y.
-                    x=xold;
-                    y=yold-1;
-                    gotoxy(x,y);
-                    printf("%c",' ');
-                }
-            else if (vy<0){
-                    // Her bliver x og y til x og y
-                    x=xold;
-                    y=yold+1;
-                    gotoxy(x,y);
-                    printf("%c",' ');
-                }
-            if (vx>0){
-                //Asteroiden bevæger sig i positiv x-putty retning (positiv y-retning)
-                //x skal være 1 mindre end afstand fra massemidtpunkt, da den har bevæget sig 1 plads i positiv x.
-                x=xold;
-                y=yold-1;
-                gotoxy(x,y);
-                printf("%*c",3,' ');
-            }
-            else if (vx<0){
-                //Asteroiden bevæger sig i negativ x-retning (y_putty) x skal være 1 større end afstand fra massemidtpunkt.
-                x=xold;
-                y=yold-1;
-            gotoxy(x,y);
-            printf("%*c",3,' ');
-            }
-        }
-}
 

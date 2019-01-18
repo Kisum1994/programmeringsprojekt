@@ -86,78 +86,6 @@ void underline(uint8_t on) {
     }
 }
 
-void window(int x1,int y1, int x2, int y2,int style,char title[]) {
-    gotoxy(x1,y1);
-    int spc = y1-1;
-    int j;
-    int i;
-    if (style==1) {
-        for (i = 0; i <= x2; i++ ) {
-            for (j = 0; j <= y2; j++ ) {
-                    if (i == 0 && j == 0) {
-                        printf("%c",201);              // øverst venstre hjørne
-                    }
-                    else if (i == 0 && j == y2) {
-                        printf("%c\n%*c",187,spc,' '); // øverst højre hjørne
-                    }
-                    else if (i == x2 && j == 0) {
-                        printf("%c",200);               // nederst venstre hjørne
-                    }
-                    else if (i == x2 && j == y2) {
-                        printf("%c\n%*c",188,spc,' ');  // nederst højre hjørne
-                    }
-                    else if (j==0 && (i !=0 && i!=x2 )) {
-                        printf("%c",186);                 // venstre væg
-                    }
-                    else if (j==y2 && (i !=0 || i!=x2 )) {
-                        printf("%c\n%*c",186,spc,' ');   // højre væg
-                    }
-                    else if ((i == 0 || i == x2) && (j !=0 || j != y2 ) ) {
-                        printf("%c", 205);               // gulv/loft
-                    }
-                    else {
-                        printf(" ") ;
-                    }
-            }
-        }
-    }
-    else if (style==2) {
-        for (i = 0; i <= x2; i++ ) {
-            for (j = 0; j <= y2; j++ ) {
-                    if (i == 0 && j == 0) {
-                        printf("%c",218);              // øverst venstre hjørne
-                    }
-                    else if (i == 0 && j == y2) {
-                        printf("%c\n%*c",191,spc,' '); // øverst højre hjørne
-                    }
-                    else if (i == x2 && j == 0) {
-                        printf("%c",192);               // nederst venstre hjørne
-                    }
-                    else if (i == x2 && j == y2) {
-                        printf("%c\n%*c",217,spc,' ');  // nederst højre hjørne
-                    }
-                    else if (j==0 && (i !=0 && i!=x2 )) {
-                        printf("%c",179);                 // venstre væg
-                    }
-                    else if (j==y2 && (i !=0 || i!=x2 )) {
-                        printf("%c\n%*c",179,spc,' ');   // højre væg
-                    }
-                    else if ((i == 0 || i == x2) && (j !=0 || j != y2 ) ) {
-                        printf("%c", 196);               // gulv/loft
-                    }
-                    else {
-                        printf(" ") ;
-                    }
-            }
-        }
-    }
-    gotoxy(x1,y1+2);
-    printf("%c",185);
-    printf(" %s ",title);
-    printf("%c",204);
-    gotoxy(1,1);
-}
-
 //------------------------------------------
 //Herfra implementeres Jespers kode fra opg3
 //------------------------------------------
@@ -206,49 +134,6 @@ int32_t rotatev(struct vector_t *v, int32_t deg) {
 return (*v).x, (*v).y;
 
 };*/
-void menu(void){
-    char menu_option;
-
-    printf("        Clock timer menu\n");
-    printf("------------------------------------------\n\n");
-
-
-    printf("Main Menu\n");
-    printf("Start the stopwatch by typing start.\n");
-    printf("Stop the stopwatch by typing stop.\n");
-    printf("Take splittime 1 by typing split1.\n");
-    printf("Take splittime 2 by typing split2.\n");
-    printf("Reset stopwatch time by typing reset.\n");
-    printf("Get help by typing help.\n");
-    printf(" Please type an option from the main menu: ");
-
-
-
-    switch(menu_option){
-
-    case 0x10:
-
-        break;
-    case 'm' :
-
-        break;
-    case'c':
-
-        break;
-    case'd':
-        break;
-    case 0x01:
-
-        break;
-    case'f':
-        /* display help message */
-        break;
-    default:
-        printf("invalid input");
-            break;
-    }
-    }
-
 
 void lcd_write_string(uint8_t * buffer, char * str,int location){
     int i=0;
