@@ -1,4 +1,3 @@
-
 // =====================================================================
 //
 //	Exported by Cearn's excellut v1.0
@@ -8,13 +7,14 @@
 
 #ifndef LUT_H
 #define LUT_H
+#include<stdint.h>
 
 // === LUT SIZES ===
-#define sinus_SIZE 512
-#define cosinus_SIZE 512
+#define SIN_SIZE 512
+#define COS_SIZE 512
 
 // === LUT DECLARATIONS ===
-extern const signed short sinus[512];
-extern const signed short cosinus[512];
+extern const signed short SIN[512];
+extern const signed int COS[512];
 
 #endif	// LUT_H

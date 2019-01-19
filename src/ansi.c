@@ -1,11 +1,13 @@
+#include "30010_io.h"
+#include "stm32f30x_conf.h"
 #include "ansi.h"
 #include "lut.h"
-#include "objects.h"
 #define ESC 0x1B
 #define FIX14_SHIFT 14
 #define FIX14_MULT(a, b) ( (a)*(b) >> FIX14_SHIFT )
+#include "charset.h"
+#include <string.h>
 
-#define ESC 0x1B
 
 void fgcolor(int foreground) {
 /*  Value      foreground     Value     foreground
@@ -34,7 +36,6 @@ void bgcolor(int background) {
                 the colors are initially like that, but when the background color is first changed there is no
  	              way comming back.
    Hint:        Use resetbgcolor(); clrscr(); to force HyperTerminal into gray text on black background.
-
     Value      Color
     ------------------
       0        Black
@@ -85,8 +86,9 @@ void underline(uint8_t on) {
     }
 }
 
-
-
+//------------------------------------------
+//Herfra implementeres Jespers kode fra opg3
+//------------------------------------------
 void printFix(int32_t i) {
  // Prints a signed 16.16 fixed point number
  if ((i & 0x80000000) != 0) { // Handle negative numbers
@@ -102,16 +104,15 @@ int32_t expand(int32_t i) {
  return i << 2;
  }
 
- void fix(int32_t i){
+ /*void fix(int32_t i){
  printFix(expand(i));
  }
-
-int32_t calcsin(int deg) {
-int32_t input = (deg*512)/360;
-return (int32_t)(sinus[input&0x1FF]);
+int32_t calcsin(int deg)
+int32_t input = (deg*512)/360;*/
+/*return (int32_t)(sinus[input&0x1FF]);
 }
-
-int32_t calccos(int deg) {
+int32_t calccos(int deg)
+{
 int32_t input = ((deg+90)*512)/360;
 return (int32_t)(sinus[input&0x1FF]);
 }
@@ -121,13 +122,41 @@ struct vector_t {
  };
 
 
+
 //void initVector(struct vector_t *v) {
  //(*v).x = -4<<14;
  //(*v).y = 2<<14;
  //};
 
 int32_t rotatev(struct vector_t *v, int32_t deg) {
-    (*v).x=FIX14_MULT((*v).x,calccos(deg))-FIX14_MULT((*v).y,calcsin(deg));
-    (*v).y=FIX14_MULT((*v).x,calcsin(deg))+FIX14_MULT((*v).y,calccos(deg));
-    return (*v).x, (*v).y;
-};
+(*v).x=FIX14_MULT((*v).x,calccos(deg))-FIX14_MULT((*v).y,calcsin(deg));
+(*v).y=FIX14_MULT((*v).x,calcsin(deg))+FIX14_MULT((*v).y,calccos(deg));
+return (*v).x, (*v).y;
+
+};*/
+
+void lcd_write_string(uint8_t * buffer, char * str,int location){
+    int i=0;
+    int j=0;
+
+    while (str[i]!=0x00) {
+            for (j=0;j<5;j++) {
+                buffer[(i*5+j)+location] = character_data[str[i]-0x20][j];
+            }
+            i++;
+    }
+}
+
+void lcd_update(uint8_t * buffer, char * str){
+
+    static int i=0;
+    static int j=0;
+    if (i==50) {
+        lcd_write_string(buffer,str,j);
+        i-=50;
+        j++;
+    }
+    i++;
+}
+
+

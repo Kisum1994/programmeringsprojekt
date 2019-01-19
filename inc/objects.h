@@ -5,8 +5,6 @@
 #include <stdio.h>
 
 // initStructs funktionerne
-
-   //STRUCT-TYPER
 struct velocityvector{
         int32_t x;
         int32_t y;
@@ -17,37 +15,17 @@ struct velocityvector{
         int ani;
         int width;
         int height;
+        int G;
+    };
 
-};
-
-struct box{
+    struct box{
         int x1;
         int x2;
         int y1;
         int y2;
-        char title[40];
+        char title[10];
         int style;
-};
-
-   // FUNKTIONER
-
-void death(struct velocityvector * deadObject);
-void initObjects(struct velocityvector * ship,struct velocityvector * shot,struct box * gameBox, struct velocityvector * seagull,struct velocityvector * asteroidS, struct velocityvector * asteroidL);
-
-void shipControls(char * str,struct velocityvector * ship,struct velocityvector * shot,struct box * gameBox);
-void updateVelocityVector(struct  velocityvector * velovector);
-void moveBall(struct velocityvector * velovector);
-int detectBarrier( struct box * gameBox, struct velocityvector * velovector);
-void shoot(struct velocityvector * shot,struct velocityvector * ship);
-int detectCollision(struct velocityvector * obj1,struct velocityvector * obj2);
-int detectCollsionShip( struct velocityvector * obj1,struct velocityvector * ship);
-
-void drawBox(struct box * gameBox);
-void drawShip(struct velocityvector * ship);
-void cleanShip(); //TOM FUNKTOIN skal laves
-void drawAsteroid(struct velocityvector * asteroid);
-void cleanAsteroid(struct velocityvector * asteroid);
-
+    };
 
 
 
