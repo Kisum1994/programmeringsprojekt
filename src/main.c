@@ -33,7 +33,7 @@
 
 
 int main(void) {
-    uart_init( 9600 ); //initialize USB serial emulation at 9600 baud
+    uart_init( 96000 ); //initialize USB serial emulation at 9600 baud
 
     // ryder op på skærmen
     clrscr();
@@ -54,7 +54,7 @@ int main(void) {
     struct velocityvector asteroidL;
     initObjects(&ship,&shot,&gameBox,&seagull,&asteroidS,&asteroidL);
 
-    printf("\e[?25l"); // gør cursor usynlig
+    // printf("\e[?25l"); // gør cursor usynlig
 
 
     printf("Pre-alpha stage: Everything you see is subject to change.\n");
@@ -62,6 +62,8 @@ int main(void) {
 
 
     drawBox(&gameBox);
+    moveAsteroid(&asteroidS);
+    moveAsteroid(&asteroidL);
 
     drawShip(&ship);
 
@@ -72,26 +74,31 @@ int main(void) {
 while (1) {
       // styring af skib
     char str[4]={""}; // denne SKAL deklares i main
-    shipControls(str, &ship, &shot,&gameBox);
+    shipControls(str, &ship, &shot, &gameBox);
 
      // shotHandler(); -> ??
 
+
+    if (moveShot(&shot,&gameBox,3)==1) {
+        // herinde er ting der skal ske samtidig med skudets bevægelse.
+        detectAsteroid(&shot, &asteroidL);
+    }
     if (shot.alive>0) {
-        moveBall(&shot);
-        // indførelse af bounce limit
-        if (detectBarrier(&gameBox,&shot)==1) {
-                shot.alive--;
-                if (shot.alive==0){
-                        death(&shot);
-                }
-        }
-        detectCollsionShip(&shot,&ship);
-        detectCollisionSeagull(&shot,&seagull);
+
+        Gravity(&shot,&asteroidL);
     }
+
+
+    //detectCollsionShip(&shot,&ship);
+    detectCollisionSeagull(&shot,&seagull);
+    detectCollisionSeagull(&ship,&seagull);
+
+
+    detectCollsionShip(&asteroidL,&ship);
     detectCollsionShip(&seagull,&ship);
-   if (getTime()==50) {
-    moveSeagull(&shot,&seagull,&gameBox);
-    }
+
+
+    moveSeagull(&shot,&seagull,&gameBox,10);
 
 
 

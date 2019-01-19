@@ -17,6 +17,7 @@ struct velocityvector{
         int ani;
         int width;
         int height;
+        int G;
 
 };
 
@@ -36,7 +37,7 @@ void initObjects(struct velocityvector * ship,struct velocityvector * shot,struc
 
 void shipControls(char * str,struct velocityvector * ship,struct velocityvector * shot,struct box * gameBox);
 void updateVelocityVector(struct  velocityvector * velovector);
-void moveBall(struct velocityvector * velovector);
+int moveShot(struct velocityvector * shot,struct box * gameBox, int speed);
 int detectBarrier( struct box * gameBox, struct velocityvector * velovector);
 void shoot(struct velocityvector * shot,struct velocityvector * ship);
 int detectCollision(struct velocityvector * obj1,struct velocityvector * obj2);

@@ -15,6 +15,8 @@
     int s_;
     int m;
     int h;
+    int tmp;
+    int tmp2;
 
 
 int getTime() {return time;}
@@ -23,6 +25,8 @@ int getS() {return s;}
 int getS_() {return s_;}
 int getM() {return m;}
 int getH() {return h;}
+int getTMP() {return tmp;}
+int getTMP2() {return tmp2;}
 
 
 void initJoystick () {
@@ -275,6 +279,7 @@ void TIM2_IRQHandler(void) { // Denne funktion beskriver hvad der sker ved inter
             }
     }
     time++;
+    tmp++;
     TIM2->SR &= ~0x0001; // Clear interrupt bit, skal gøre for at kunne bruge interrupt igen.
  }
 
@@ -449,3 +454,14 @@ int arrowInput(char * str) {  // keypoardInput bliver oversat til HEX-tal
         }
 }
 
+
+int update(int speed) {
+    if ( tmp >= speed ){
+        tmp = 0;
+        return 1;
+    }
+
+    else{
+    return 0;
+    }
+}
