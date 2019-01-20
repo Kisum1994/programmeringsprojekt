@@ -6,20 +6,24 @@
 #include "lut.h"
 
 #define ESC 0x1B
-// gloable varibler:  !skal være ens i startUP();
+// gloable varibler:  !brug get-funktionerne når de globale variabler skal bruges andre steder end i GPIO.c
     int time;
+    int time_;
     int s;
     int s_;
     int m;
     int h;
 
-void startUP() { // initialisering af globale tidskonstanter. Skal bruges øverst i main.
-    int time;
-    int s;
-    int s_;
-    int m;
-    int h;
-}
+
+int getTime() {return time;}
+int getTime_() {return time_;}
+int getS() {return s;}
+int getS_() {return s_;}
+int getM() {return m;}
+int getH() {return h;}
+
+
+
 
 void initJoystick () {
  RCC->AHBENR |= RCC_AHBPeriph_GPIOA;
@@ -154,6 +158,7 @@ void initLED() {
 
 
 
+
  // Set pin PC7 to output */
  GPIOC->OSPEEDR &= ~(0x00000003 << (7 * 2)); // Clear speed register
  GPIOC->OSPEEDR |= (0x00000002 << (7 * 2));
@@ -242,13 +247,13 @@ void LEDjoystick() {
 
 
 void initTimer (){
- RCC->APB1ENR |= RCC_APB1Periph_TIM2; // Enable clock line to timer 2;
- TIM2->CR1 = 0x0000; // Configure timer 2
- TIM2->ARR = 0x03E7; // Set reload value
- TIM2->PSC = 0x027F; // Set prescale value
- TIM2->DIER |= 0x0001; // Enable timer 2 interrupts
- NVIC_SetPriority(0x001C, 0x0); // Set interrupt priority
- NVIC_EnableIRQ(0x001C); // Enable interrupt
+ RCC->APB2ENR |= RCC_APB2Periph_TIM15; // Enable clock line to timer 2;
+ TIM15->CR1 = 0x0000; // Configure timer 2
+ TIM15->ARR = 63999; // Set reload value
+ TIM15->PSC = 9; // Set prescale value
+ TIM15->DIER |= 0x0001; // Enable timer 2 interrupts
+ NVIC_SetPriority(0x0018, 0x0); // Set interrupt priority
+ NVIC_EnableIRQ(0x0018);// Enable interrupt
 // // TIM2->CR1 = 0x0001; --- start timer 2 -- skriv dette i main for at starte timeren
 }
 
@@ -343,7 +348,7 @@ void TIM2_IRQHandler(void) { // Denne funktion beskriver hvad der sker ved inter
         //Do whatever you want here, but make sure it doesn’t take too much time!
         // OMREGN TIL SEKUNDER! fra 1/100 dele sek
         // dette er hvad der sker ved en interrupt i timer 2
-    if (time>=100) {
+  /*  if (time>=100) {
             s++;
             time -= 100;
             if (s>=60) {
@@ -355,7 +360,7 @@ void TIM2_IRQHandler(void) { // Denne funktion beskriver hvad der sker ved inter
                 m=0;
             }
     }
-    time++;
+    time++;*/
     TIM2->SR &= ~0x0001; // Clear interrupt bit, skal gøre for at kunne bruge interrupt igen.
  }
 
@@ -524,3 +529,51 @@ int arrowInput(char * str) {
         }
 }
 
+void initBuzzer(){
+ RCC->APB1ENR |= 0x00000001; // Enable clock line to timer 2;
+ TIM2->CR1 = 0x0000; // Disable timer
+ TIM2->ARR = 0x03e7; // Set auto reload value
+ TIM2->PSC = 0x027f; // Set pre-scaler value
+ TIM2->CR1 |= 0x0001; // Enable timer
+
+ TIM2->CCER &= ~TIM_CCER_CC3P; // Clear CCER register
+ TIM2->CCER |= 0x00000001 << 8; // Enable OC3 output
+ TIM2->CCMR2 &= ~TIM_CCMR2_OC3M; // Clear CCMR2 register
+ TIM2->CCMR2 &= ~TIM_CCMR2_CC3S;
+ TIM2->CCMR2 |= TIM_OCMode_PWM1; // Set output mode to PWM1
+ TIM2->CCMR2 &= ~TIM_CCMR2_OC3PE;
+ TIM2->CCMR2 |= TIM_OCPreload_Enable;
+ TIM2->CCR3 = 500; // Set duty cycle to 50 %
+ RCC->AHBENR |= RCC_AHBENR_GPIOBEN; // Enable clock line for GPIO bank B
+ GPIOB->MODER &= ~(0x00000003 << (10 * 2)); // Clear mode register
+ GPIOB->MODER |= (0x00000002 << (10 * 2)); // Set mode register
+ GPIO_PinAFConfig(GPIOB, GPIO_PinSource10, GPIO_AF_1);
+
+}
+void setFreq(uint16_t freq) {
+ uint32_t reload = 64e6 / freq / (0x027f + 1) - 1;
+ TIM2->ARR = reload; // Set auto reload value
+ TIM2->CCR3 = reload/2; // Set compare register
+ TIM2->EGR |= 0x01;
+ }
+void TIM1_BRK_TIM15_IRQHandler(void){
+
+        //Do whatever you want here, but make sure it doesn’t take too much time!
+        // OMREGN TIL SEKUNDER! fra 1/100 dele sek
+        // dette er hvad der sker ved en interrupt i timer 2
+    if (time>=100) {
+            s++;
+            time -= 100;
+            if (s>=60) {
+                m++;
+                //s=0;
+            }
+            if (m>=60) {
+                h++;
+                m=0;
+            }
+    }
+    time++;
+    TIM15->SR &= ~0x0001; // Clear interrupt bit, skal gøre for at kunne bruge interrupt igen.
+
+}

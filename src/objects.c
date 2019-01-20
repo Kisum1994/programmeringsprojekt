@@ -13,20 +13,7 @@
 
 #define ESC 0x1B
 
-    int time;
-    int time_;
-    int s;
-    int s_;
-    int m;
-    int h;
 
- // OBJEKTER:
-int getTime() {return time;}
-int getTime_() {return time_;}
-int getS() {return s;}
-int getS_() {return s_;}
-int getM() {return m;}
-int getH() {return h;}
 
 
 void death(struct velocityvector * deadObject){
