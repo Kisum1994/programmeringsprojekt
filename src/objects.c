@@ -66,6 +66,7 @@ void initObjects(struct velocityvector * ship,struct velocityvector * shot,struc
         ship->height=3;
         ship->width=3;
         ship->alive=1;
+        ship->health=2;
 
     // SHOT
         shot->x=0;
@@ -301,7 +302,12 @@ int detectCollision(struct velocityvector * obj1,struct velocityvector * obj2){
 int detectCollsionShip( struct velocityvector * obj1,struct velocityvector * ship) {
 
          if (detectCollision(obj1,ship)==1) {
+                if(ship->health>0){
+                    ship->health--;
+                }
+                else{
                 death(ship);
+                }
                 death(obj1);
 
                 return 1;

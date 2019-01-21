@@ -25,11 +25,11 @@
 
 
 
-int scale(char  tone){
-if(strcmp("A",&tone)){
+int16_t scale(const char * tone){
+if(strcmp("A",tone)==0){
     return 440;
 }
-else if (strcmp("Ab",tone==0)){
+else if (strcmp("Ab",tone)==0){
     return 415;
 }
 else if (strcmp("G",tone)==0){
@@ -64,7 +64,7 @@ else if (strcmp("Bb",tone)==0){
 }
 }
 
-char mario(int * tone){
+const char * mario(int tone){
 if(tone==1){
     return "E";
 }
@@ -105,7 +105,47 @@ else if (tone==12){
 
 }
 
+int bossKey( char * text, struct velocityvector * seagull0, struct box gameBox, struct velocityvector * seagull1, struct velocityvector * seagull2, struct velocityvector * seagull3, struct velocityvector * ship, struct velocityvector * shot, struct velocityvector * asteroidS, struct velocityvector * asteroidL){
 
+    if (arrowInput(text)==0x30){
+    uart_clear();
+    TIM15->CR1 |= 0x0000;
+    clrscr();
+    while(1){
+        if(arrowInput(text)==0x30){
+        TIM15->CR1 |= 0x0001;
+        drawBox(gameBox);
+        if(ship->alive==1){
+        drawShip(ship);
+        }
+        if (seagull0->alive==1){
+        drawSeagull(seagull0);
+        }
+        if (seagull1->alive==1){
+        drawSeagull(seagull1);
+        }
+        if (seagull2->alive==1){
+        drawSeagull(seagull2);
+        }
+        if (seagull3->alive==1){
+        drawSeagull(seagull3);
+        }
+        if (asteroidS->alive==1){
+        drawAsteroid(asteroidS);
+        }
+        if (asteroidL->alive==1){
+        drawAsteroid(asteroidL);
+        }
+        if(shot->alive==1){
+        moveBall(shot);
+        }
+        }
+    }
+    }
+
+
+
+}
 
 int main(void) {
     uart_init( 9600 );
@@ -127,13 +167,13 @@ int main(void) {
 
     initBuzzer();
     int i=1;
-    char o;
-    int a;
+    const char * m;
+    int16_t s;
     while(1){
     if (getTime()==4)  {
-    o=mario(i);
-    a=scale(o);
-    setFreq(a);
+    m=mario(i);
+    s=scale(m);
+    setFreq(s);
     i++;
     if(i==12)
         {i=1;

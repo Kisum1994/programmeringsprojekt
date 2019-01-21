@@ -16,6 +16,7 @@
         int ani;
         int width;
         int height;
+        int health;
     };
 
     struct box{
