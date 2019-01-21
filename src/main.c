@@ -79,7 +79,7 @@ while (1) {
     char str[4]={""};  // denne SKAL deklares i main
    if(keyboardInput(str)>0) {
 
-    shipControls(str, &ship, &shot, &gameBox);// styring af skib
+    shipControls(str, &ship, &shot, &gameBox,&asteroidL);// styring af skib
 
 
     bossKey(str,&ship,&shot,&gameBox,&seagull0,&seagull1,&seagull2,&seagull3,&asteroidS,&asteroidL);
@@ -91,24 +91,25 @@ while (1) {
     }
     if (shot.alive>0) {
 
-        //Gravity(&shot,&asteroidL);
+       // Gravity(&shot,&asteroidL);
     }
 
 
     //detectCollsionShip(&shot,&ship);
-    detectCollisionSeagull(&shot,&seagull0);
+    //detectCollisionSeagull(&shot,&seagull0);
 
 
 
 
     detectCollsionShip(&asteroidL,&ship);
-    //detectCollsionShip(&seagull0,&ship);
 
-    if(updateSeagull1(1)==15){
+    detectCollsionShip(&seagull0,&ship);
+
+    if(updateSeagull1(5)==1){
         moveSeagull(&shot,&seagull0 ,&gameBox);
     }
     detectAsteroid(&seagull0, &asteroidL);
-    detectAsteroid(&seagull0,&asteroidS);
+    detectAsteroid(&seagull0, &asteroidS);
 
 
 
@@ -122,7 +123,7 @@ while (1) {
  } // enden af programmets whileloop
 
 
-gotoxy(25,25);
+gotoxy(ship.x-5,ship.y);
 printf("U DEAD HA HA HA!");
 
 

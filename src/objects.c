@@ -80,7 +80,7 @@ void initObjects(struct velocityvector * ship,struct velocityvector * shot,struc
         ship->vx=0;
         ship->vy=0;
         ship->x=25;
-        ship->y=25;
+        ship->y=20;
         ship->ang=0;
         ship->height=3;
         ship->width=3;
@@ -474,7 +474,7 @@ void reviveSeagull(struct velocityvector * seagull,int x, int y, int vx, int vy)
     //ANIMATION AF OBJEKTER:
 
 
-void shipControls(char * str,struct velocityvector * ship,struct velocityvector * shot, struct box * gameBox) {
+void shipControls(char * str,struct velocityvector * ship,struct velocityvector * shot, struct box * gameBox,struct velocityvector * asteroid0) {
 // char str[4]={""};   <-- denne SKAL defineres i main
     int draw=0;
     int moved=0;
@@ -498,7 +498,17 @@ void shipControls(char * str,struct velocityvector * ship,struct velocityvector 
                 draw=1;
             }
             if(arrowInput(str)==0x01){
-                shoot(shot,ship);
+                if (ship->x-2==asteroid0->x-(asteroid0->height-1)/2 && (ship->ang==7 || ship->ang==0 || ship->ang==1) ){
+                }
+                else if(ship->x+2==asteroid0->x+(asteroid0->height-1)/2 && (ship->ang==3 || ship->ang==4 || ship->ang==5) ) {
+                }
+                else if(ship->y-2==asteroid0->y-(asteroid0->width-1)/2 && (ship->ang==1 || ship->ang==2 || ship->ang==3) ) {
+                }
+                else if(ship->y+2==asteroid0->y+(asteroid0->width-1)/2 && (ship->ang==5 || ship->ang==6 || ship->ang==7) ) {
+                }
+                else {
+                    shoot(shot,ship);
+                }
             }
 
 
@@ -518,19 +528,19 @@ void shipControls(char * str,struct velocityvector * ship,struct velocityvector 
                     moved=1;
                     if (ship->ang==7 || ship->ang==0 || ship->ang==1) {
                         ship->x--;
-                        ship->vx=-1;
+                        //ship->vx=-1;
                     }
                     if (ship->ang==1 || ship->ang==2 || ship->ang==3) {
                         ship->y--;
-                        ship->vy=-1;
+                      //  ship->vy=-1;
                     }
                     if (ship->ang==3 || ship->ang==4 || ship->ang==5) {
                         ship->x++;
-                        ship->vx=1;
+                       // ship->vx=1;
                     }
                     if (ship->ang==5 || ship->ang==6 || ship->ang==7) {
                         ship->y++;
-                        ship->vy=1;
+                      //  ship->vy=1;
                     }
                 }
             }
@@ -558,7 +568,7 @@ velovector->y = velovector->y+velovector->vy;
 
 void drawShot(int32_t x, int32_t y){
 gotoxy(x,y);
-printf("%c",248);
+printf("%s","o");
 }
 
 int moveShot(struct velocityvector * shot,struct box * gameBox,int speed){
@@ -661,12 +671,12 @@ int detectBarrier( struct box * gameBox, struct velocityvector * velovector){
 }
 
 int detectAsteroid(struct velocityvector * velovector,struct velocityvector * asteroid){
-
-    if ((velovector->x+velovector->vx+((velovector->height-1)/2)  >=  asteroid->x+asteroid->vx-((asteroid->height-1)/2)  && velovector->x <= asteroid->x+((asteroid->height-1)/2) &&  velovector->y >= asteroid->y-(asteroid->width-1)/2)   &&   velovector->y <= asteroid->y+((asteroid->width-1)/2)) {
+    int bounce=0;
+  /*  if ((velovector->x+velovector->vx+((velovector->height-1)/2)  >=  asteroid->x+asteroid->vx-((asteroid->height-1)/2)  && velovector->x <= asteroid->x+((asteroid->height-1)/2) &&  velovector->y >= asteroid->y-(asteroid->width-1)/2)   &&   velovector->y <= asteroid->y+((asteroid->width-1)/2)) {
             velovector->vx=velovector->vx*(-1);
             return 1;
     }
-    if ((velovector->x+velovector->vx-((velovector->height-1)/2) <=  asteroid->x+asteroid->vx+((asteroid->height-1)/2) && velovector->x >= asteroid->x-((asteroid->height-1)/2) &&  velovector->y >= asteroid->y-(asteroid->width-1)/2)   &&   velovector->y <= asteroid->y+((asteroid->width-1)/2)){
+    else if ((velovector->x+velovector->vx-((velovector->height-1)/2) <=  asteroid->x+asteroid->vx+((asteroid->height-1)/2) && velovector->x >= asteroid->x-((asteroid->height-1)/2) &&  velovector->y >= asteroid->y-(asteroid->width-1)/2)   &&   velovector->y <= asteroid->y+((asteroid->width-1)/2)){
             velovector->vx=velovector->vx*(-1);
             return 1;
     }
@@ -674,16 +684,30 @@ int detectAsteroid(struct velocityvector * velovector,struct velocityvector * as
             velovector->vy=velovector->vy*(-1);
             return 1;
     }
-    if ((velovector->y+velovector->vy-((velovector->width-1)/2) <=  asteroid->y+asteroid->vy+((asteroid->width-1)/2) && velovector->y >= asteroid->y-((asteroid->width-1)/2) &&  velovector->x >= asteroid->x-(asteroid->height-1)/2)   &&   velovector->x <= asteroid->x+((asteroid->height-1)/2)){
+    else if ((velovector->y+velovector->vy-((velovector->width-1)/2) <=  asteroid->y+asteroid->vy+((asteroid->width-1)/2) && velovector->y >= asteroid->y-((asteroid->width-1)/2) &&  velovector->x >= asteroid->x-(asteroid->height-1)/2)   &&   velovector->x <= asteroid->x+((asteroid->height-1)/2)){
             velovector->vy=velovector->vy*(-1);
             return 1;
-    }
-    else if (velovector->x != asteroid->x+asteroid->vx-((asteroid->height-1)/2) && velovector->y != asteroid->y+asteroid->vy-((asteroid->width-1)/2) && velovector->x+velovector->vx  >=  asteroid->x+asteroid->vx-((asteroid->height-1)/2) && velovector->y+velovector->vy  >=  asteroid->y+asteroid->vy-((asteroid->width-1)/2) ){
-            velovector->vx=velovector->vx*(-1);
-            velovector->vy=velovector->vy*(-1);
-            return 1;
-    }
+    } */
 
+    if (velovector->x < asteroid->x+asteroid->vx-((asteroid->height-1)/2) && velovector->x+velovector->vx  >=  asteroid->x+asteroid->vx-((asteroid->height-1)/2) &&  velovector->y+velovector->vy >= asteroid->y-((asteroid->width-1)/2)   &&   velovector->y+velovector->vy <= asteroid->y+((asteroid->width-1)/2)){
+            velovector->vx=velovector->vx*(-1);
+            bounce=1;
+    }
+    if (velovector->x > asteroid->x+asteroid->vx+((asteroid->height-1)/2) && velovector->x+velovector->vx <= asteroid->x+asteroid->vx+((asteroid->height-1)/2) && velovector->y+velovector->vy >= asteroid->y-((asteroid->width-1)/2)   &&   velovector->y+velovector->vy <= asteroid->y+((asteroid->width-1)/2)){
+            velovector->vx=velovector->vx*(-1);
+            bounce=1;
+    }
+    if(velovector->y < asteroid->y+asteroid->vy-((asteroid->width-1)/2) && velovector->y+velovector->vy  >=  asteroid->y+asteroid->vy-((asteroid->width-1)/2) && velovector->x+velovector->vx >= asteroid->x-((asteroid->height-1)/2)   &&   velovector->x+velovector->vx <= asteroid->x+((asteroid->height-1)/2)){
+            velovector->vy=velovector->vy*(-1);
+            bounce=1;
+    }
+    if(velovector->y > asteroid->y+asteroid->vy+((asteroid->width-1)/2) && velovector->y+velovector->vy  <=  asteroid->y+asteroid->vy+((asteroid->width-1)/2) && velovector->x+velovector->vx >= asteroid->x-((asteroid->height-1)/2)   &&   velovector->x+velovector->vx <= asteroid->x+((asteroid->height-1)/2)){
+            velovector->vy=velovector->vy*(-1);
+            bounce=1;
+    }
+    if (bounce==1) {
+            return 1;
+    }
     else return 0;
 }
 
@@ -748,28 +772,50 @@ void shoot(struct velocityvector * shot,struct velocityvector * ship) {
 
 int detectCollision(struct velocityvector * obj1,struct velocityvector * obj2){
     // forsøg at brug så obj2 er større end obj1 for mindske iterartions i for loops
-    int i1=(obj1->x+obj1->vx-((obj1->height-1)/2));
-    int j1=(obj1->y+obj1->vy-((obj1->width-1)/2));
+    // XOR:  ((a || b) && !(a && b))
+    int hitx=0;
+    int hity=0;
 
-    int i2=(obj1->x+obj1->vx+((obj1->height-1)/2));
-    int j2=(obj1->y+obj1->vy+((obj1->width-1)/2));
+    int i1=(obj1->x+obj1->vx)-(obj1->height-1)/2;
+    int j1=(obj1->y+obj1->vy)-(obj1->width-1)/2;
+
+    int i2=i1+obj1->height;
+    int j2=j1+obj1->width;
 
     int k1=(obj2->x+obj2->vx-((obj2->height-1)/2));
     int l1=(obj2->y+obj2->vy-((obj2->width-1)/2));
 
-    int k2=(obj2->x+obj2->vx+((obj2->height-1)/2));
-    int l2=(obj2->y+obj2->vy+((obj2->width-1)/2));
+    int k2=k1+obj2->height;
+    int l2=l1+obj2->width;
 
-    for(i1;i1<=i2;i1++){
-            for(j1;j1<=j2;j1++){
-                    if(k1 <= i1 && i1 <= k2 && l1<= j1 && j1 <= l2){
-                        return 1;
-                    }
-                    else {
-                        return 0;
+    if  ((k2 > i1 && k1 < i2)){
+            hitx=1;
+    }
+    if (l2> j1 && l1 < j2) {
+            hity=1;
+    }
+    if (hitx==1 && hity==1) {
+        return 1;
+    }
+    else {
+        return 0;
+    }
+
+    /* for(int x=i1; x<= i2; x++){
+
+            for(int y=j1; y <=j2; y++){
+                    for (int z=k1; z<=k2;z++){
+                            for (int w=l1 ; w<=l1; w++){
+                                if( x == z && y == w){
+                                    return 1;
+                                }
+                                else {
+                                    return 0;
+                                }
+                            }
                     }
             }
-    }
+    } */
 }
 
 int detectCollsionShip( struct velocityvector * obj1,struct velocityvector * ship) {
@@ -784,10 +830,12 @@ int detectCollsionShip( struct velocityvector * obj1,struct velocityvector * shi
 }
 
 int detectCollisionSeagull( struct velocityvector * obj1 ,struct velocityvector * seagull){
-    if (detectCollision(obj1,seagull)==1) {
-        death(seagull);
-        death(obj1);
-        return 1;
+    if (seagull->alive > 0) {
+        if (detectCollision(obj1,seagull)==1) {
+            death(seagull);
+            death(obj1);
+            return 1;
+        }
     }
     else {
         return 0;
@@ -1022,21 +1070,27 @@ void cleanShip(struct velocityvector * ship) {
 void drawAsteroid(struct velocityvector * asteroid){
 
         if (asteroid->width==5){ // Asteroide size stor
-            int x=asteroid->x-1;
-            int y=asteroid->y-2;
-            gotoxy(x,y);
+            int xc=asteroid->x-2;
+            int yc=asteroid->y-2;
+            gotoxy(xc,yc);
             printf("%c%c%c%c%c",220,219,219,219,' ');
-            gotoxy(x+1,y);
+            gotoxy(xc+1,yc);
             printf("%c%c%c%c%c",219,178,219,219,219);
-            gotoxy(x+2,y);
+            gotoxy(xc+2,yc);
+            printf("%c%c%c%c%c",219,219,219,178,219);
+            gotoxy(xc+3,yc);
+            printf("%c%c%c%c%c",219,219,219,219,219);
+            gotoxy(xc+4,yc);
             printf("%c%c%c%c%c",223,219,219,219,223);
         }
         else if (asteroid->width==3){ // Asteroide size lille
-            gotoxy(asteroid->x-1,asteroid->y-1);
+            int xc=asteroid->x-1;
+            int yc=asteroid->y-1;
+            gotoxy(xc,yc);
             printf("%c%c%c",220,219,220);
-            gotoxy(asteroid->x,asteroid->y-1);
+            gotoxy(xc+1,yc);
             printf("%c%c%c",219,219,219);
-            gotoxy(asteroid->x+1,asteroid->y-1);
+            gotoxy(xc+2,yc);
             printf("%c%c%c",223,219,223);
         }
 }
