@@ -1,11 +1,13 @@
 #include "30010_io.h"
 
-#include "GPIO.h"
 #include "ansi.h"
+#include "GPIO.h"
 #include "charset.h"
 #include "lut.h"
+#include "objects.h"
 
 #define ESC 0x1B
+
 // gloable varibler:  !brug get-funktionerne når de globale variabler skal bruges andre steder end i GPIO.c
     int time;
     int time_;
@@ -13,6 +15,9 @@
     int s_;
     int m;
     int h;
+    int tmp;
+    int tmp1;
+    int tmp2;
 
 
 int getTime() {return time;}
@@ -21,9 +26,8 @@ int getS() {return s;}
 int getS_() {return s_;}
 int getM() {return m;}
 int getH() {return h;}
-
-
-
+int getTMP() {return tmp;}
+int getTMP2() {return tmp2;}
 
 void initJoystick () {
  RCC->AHBENR |= RCC_AHBPeriph_GPIOA;
@@ -87,7 +91,6 @@ int8_t readJoystick () {
     uint16_t valHojre = GPIOC->IDR & (0x0001 << 0);
     uint16_t valVenstre = GPIOC->IDR & (0x0001 << 1);
     int8_t valJ;
-    int j=0;
     int i=0;
 
         if (valUp > 0 && i==0) {
@@ -118,6 +121,9 @@ int8_t readJoystick () {
     if (i!=0) {
         return valJ;
         i=0;
+    }
+    else {
+    return 0;
     }
 }
 
@@ -155,7 +161,6 @@ void initLED() {
  GPIOB->MODER &= ~(0x00000003 << (4 * 2)); // Clear mode register
  GPIOB->MODER |= (0x00000001 << (4 * 2));
  /* Set mode register (0x00 – Input, 0x01 - Output, 0x02 - Alternate Function, 0x03 - Analog in/out) */
-
 
 
 
@@ -203,21 +208,20 @@ void LEDjoystick() {
 
     }
     */
-
+    int valJ[3]={0,0,0};
+    int j=0;
+    int i=0;
     uint16_t valUp = GPIOA->IDR & (0x0001 << 4);
     uint16_t valNed = GPIOB->IDR & (0x0001 << 0);
     uint16_t valCenter = GPIOB->IDR & (0x0001 << 5);
     uint16_t valHojre = GPIOC->IDR & (0x0001 << 0);
     uint16_t valVenstre = GPIOC->IDR & (0x0001 << 1);
-    int valJ[3]={0,0,0};
-    int j;
-    int i;
 
         if (valUp > 0) {
             valJ[0]= 1;
             i=1;
         }
-         else if (valNed > 0) {
+        else if (valNed > 0) {
             valJ[1]= 1;
             i=1;
         }
@@ -239,16 +243,15 @@ void LEDjoystick() {
             i=0;
         }
 
-    if (j!=i) {
-        setLED(valJ);
-        j = i;
-    }
+        if (i!=j) {
+            setLED(valJ);
+            j = i;
+        }
 }
 
-
-void initTimer (){
+void initTimer (){ // TIM 15
  RCC->APB2ENR |= RCC_APB2Periph_TIM15; // Enable clock line to timer 2;
- TIM15->CR1 = 0x0000; // Configure timer 2
+ TIM15->CR1 &= ~0x0001; // Configure timer 2
  TIM15->ARR = 63999; // Set reload value
  TIM15->PSC = 9; // Set prescale value
  TIM15->DIER |= 0x0001; // Enable timer 2 interrupts
@@ -257,120 +260,68 @@ void initTimer (){
 // // TIM2->CR1 = 0x0001; --- start timer 2 -- skriv dette i main for at starte timeren
 }
 
- /* void TIM2_IRQHandler(void) {
-        //Do whatever you want here, but make sure it doesn’t take too much time!
-        // OMREGN TIL SEKUNDER! fra 1/100 dele s
-    time++;
-    printf("%d\n",time);
-
- TIM2->SR &= ~0x0001; // Clear interrupt bit
- } */
-//----------------
-
-
-
-void timer () {  //OUTDATED, trapper bruger i et while loop
-    while(1) {
-
-        int i=0;
-        int j=1;
-        int k=0;
-        int l_old=0;
-            if (readJoystick()==0x00 && i!=j) {
-                while (1) {
-
-                    if (readJoystick()==0x10) {
-                        TIM2->CR1 = 0x0001;
-                        j=i;
-                        l_old=1;
-                        break;
-                    }
-                    if (readJoystick()==0x01) {
-                        i=0;
-                        j=1;
-
-                        time=0;
-                        s=0;
-                        m=0;
-                        h=0;
-                        gotoxy(2,0);
-                        clreol();
-                        printf("%02d.%02d.%02d\n",h,m,s);
-                        gotoxy(2,0);
-                    }
-                    if (readJoystick()==0x02) {
-                        k=1;
-                        break;
-                    }
-                }
-            }
-
-            if(k==1) {
-                break;
-            }
-
-            else if (i==j) {
-                while (1) {
-
-                    if (s!=s_) {
-                        printf("%02d.%02d.%02d\n",h,m,s);
-                        gotoxy(2,0);
-                        (s_)=(s);
-                        l_old=0;
-                    }
-                    if (readJoystick()==0x08) {
-                           gotoxy(3,0);
-                           printf("Split 1: %02d.%02d.%02d\n",h,m,s);
-                           gotoxy(2,0);
-                           l_old=0;
-                    }
-                    if (readJoystick()==0x04) {
-                           gotoxy(4,0);
-                           printf("Split 2: %02d.%02d.%02d\n",h,m,s);
-                           gotoxy(2,0);
-                           l_old=0;
-                    }
-                    if (readJoystick()==0x10 && l_old==0) {
-                        TIM2->CR1 = 0x0000;
-                        i=0;
-                        j=1;
-                        break;
-                    }
-
-                }
-            }
-    }
-}
-
-void TIM2_IRQHandler(void) { // Denne funktion beskriver hvad der sker ved interrupt af timer2
-
-
+void TIM1_BRK_TIM15_IRQHandler(void){
         //Do whatever you want here, but make sure it doesn’t take too much time!
         // OMREGN TIL SEKUNDER! fra 1/100 dele sek
         // dette er hvad der sker ved en interrupt i timer 2
-  /*  if (time>=100) {
+    if (time>=100) {
             s++;
             time -= 100;
             if (s>=60) {
                 m++;
-                s=0;
+                //s=0;
             }
             if (m>=60) {
                 h++;
                 m=0;
             }
     }
-    time++;*/
-    TIM2->SR &= ~0x0001; // Clear interrupt bit, skal gøre for at kunne bruge interrupt igen.
- }
+    time++;
+    tmp++;
+    tmp1++;
+    tmp2++;
 
- int8_t get_char(char * text, int length/*, int* buffcount // dette kan bruges i stedet for en statisk variable, med initialisering i main af buffcount*/) {
+    TIM15->SR &= ~0x0001; // Clear interrupt bit, skal gøre for at kunne bruge interrupt igen.
 
-    /* INDSÆT SÅLEDES I MAIN: HVIS MAN VIL PRINTE DEN INDTASTEDE STRING. !man behøver ikke at printe stringen!
+}
+
+void initBuzzer(){
+     RCC->APB1ENR |= 0x00000001; // Enable clock line to timer 2;
+     TIM2->CR1 = 0x0000; // Disable timer
+     TIM2->ARR = 0x03e7; // Set auto reload value
+     TIM2->PSC = 0x027f; // Set pre-scaler value
+     TIM2->CR1 |= 0x0001; // Enable timer
+
+     TIM2->CCER &= ~TIM_CCER_CC3P; // Clear CCER register
+     TIM2->CCER |= 0x00000001 << 8; // Enable OC3 output
+     TIM2->CCMR2 &= ~TIM_CCMR2_OC3M; // Clear CCMR2 register
+     TIM2->CCMR2 &= ~TIM_CCMR2_CC3S;
+     TIM2->CCMR2 |= TIM_OCMode_PWM1; // Set output mode to PWM1
+     TIM2->CCMR2 &= ~TIM_CCMR2_OC3PE;
+     TIM2->CCMR2 |= TIM_OCPreload_Enable;
+     TIM2->CCR3 = 500; // Set duty cycle to 50 %
+     RCC->AHBENR |= RCC_AHBENR_GPIOBEN; // Enable clock line for GPIO bank B
+     GPIOB->MODER &= ~(0x00000003 << (10 * 2)); // Clear mode register
+     GPIOB->MODER |= (0x00000002 << (10 * 2)); // Set mode register
+     GPIO_PinAFConfig(GPIOB, GPIO_PinSource10, GPIO_AF_1);
+
+}
+
+void setFreq(uint16_t freq) {
+     uint32_t reload = 64e6 / freq / (0x027f + 1) - 1;
+     TIM2->ARR = reload; // Set auto reload value
+     TIM2->CCR3 = reload/2; // Set compare register
+     TIM2->EGR |= 0x01;
+}
+
+
+int8_t get_char(char * text, int length) {
+
+    /* INDSÆT SÅLEDES I MAIN: HVIS MAN F.EKS. VIL PRINTE DEN INDTASTEDE STRING. !man behøver ikke at printe stringen!
     Der defineres en string  str[length+1] main som man "overskriver" ved hjælp af get_char når get_char har ændret str vil den returne 1
 
     uart_clear();
-    char str[4];
+    char str[4];  <-- defineret string der ændres af get_char
 
     while (1) {
 
@@ -405,13 +356,16 @@ void TIM2_IRQHandler(void) { // Denne funktion beskriver hvad der sker ved inter
     return 0;
 }
 
-void PCtimer (int * input) { // stopur der kan kontrolleres med get_char og userInput funktionerne
-                    if (input==0x10) {  // tænder ur
+
+
+void PCtimer (int * input) { // stopur der kan kontrolleres med get_char og userInput funktionerne. Brug userInput(readKeyboard()) som input.
+
+                    if (input[0]==0x10) {  // tænder ur
                         TIM2->CR1 = 0x0001;
                         printf("Ur startet");
                     }
 
-                    if (input==0x01) {  // reseter ur
+                    if (input[0]==0x01) {  // reseter ur
                         time=0;
                         s=0;
                         m=0;
@@ -426,17 +380,17 @@ void PCtimer (int * input) { // stopur der kan kontrolleres med get_char og user
                             (s_)=(s);
                     }
 
-                    if (input==0x08) { // split 1
+                    if (input[0]==0x08) { // split 1
 
                             printf("Split 1: %02d.%02d.%02d\n",h,m,s);
                     }
 
-                    if (input==0x04) { // split 2
+                    if (input[0]==0x04) { // split 2
 
                            printf("Split 2: %02d.%02d.%02d\n",h,m,s);
                     }
 
-                    if (input==0x20) { // stopper ur
+                    if (input[0]==0x20) { // stopper ur
                             TIM2->CR1 = 0x0000;
                             printf("Ur stopppet");
                     }
@@ -447,62 +401,62 @@ int userInput(char * str) { // til keyboard styring af PCtimer();
 
         if (strcmp(str,"start")==0) {
             return 0x10;
-        } else if (strcmp(str,"stop")==0 ) {
+        }
+        else if (strcmp(str,"stop")==0 ) {
             return 0x20;
-
-        } else if (strcmp(str,"split1" )==0) {
+        }
+        else if (strcmp(str,"split1" )==0) {
             return 0x08;
-
-        } else if (strcmp(str,"split2")==0 ) {
+        }
+        else if (strcmp(str,"split2")==0 ) {
             return 0x04;
-
-        } else if (strcmp(str,"reset" )==0) {
+        }
+        else if (strcmp(str,"reset" )==0) {
             return 0x01;
+        }
+        else {
+            return 0;
         }
 }
 
 
-int8_t keyboardInput(char * text) {
+int8_t keyboardInput(char * text) {  // SKAL MÅSKE IKKE LIGGE I GPIO.c
     // fungerer som get_char(); men har en grænse på 3 karakterer for piletasterne
-
     static int buffCount=0; //Husk at forklare static variable i rapport
-
-
     if (buffCount<3) {
         if (0<uart_get_count()) {
             text[buffCount]=uart_get_char();
             buffCount++;
-
         }
         if (text[buffCount-1]==0x0d) {
-
             text[buffCount]=0x00;
             buffCount = 0;
             return 1;
             uart_clear();
         }
         else if (text[buffCount-1]==0x20) {
-
             text[buffCount]=0x00;
             buffCount = 0;
             return 1;
             uart_clear();
         }
     }
-     if(buffCount==3){
+    if(buffCount==3){
 
         buffCount = 0;
         return 1;
         uart_clear();
-
-        }
-return 0;
+    }
+    else {
+        return 0;
+    }
 }
 
 
 
 
-int arrowInput(char * str) {
+int arrowInput(char * str) {  // keypoardInput bliver oversat til HEX-tal
+// char str[4]={""};   <-- denne SKAL defineres i main
 
         if (str[2]==65) { //pil op
             return 0x10;
@@ -521,59 +475,47 @@ int arrowInput(char * str) {
             str[2]=0x00;
         }
 
-         if (str[0]==0x20) { //mellemrum
+        if (str[0]==0x20) { //mellemrum
             return 0x01;
         }
         if (str[0]==0x0d) { //enter
             return 0x30;
         }
+        else {
+            return 0;
+        }
 }
 
-void initBuzzer(){
- RCC->APB1ENR |= 0x00000001; // Enable clock line to timer 2;
- TIM2->CR1 = 0x0000; // Disable timer
- TIM2->ARR = 0x03e7; // Set auto reload value
- TIM2->PSC = 0x027f; // Set pre-scaler value
- TIM2->CR1 |= 0x0001; // Enable timer
 
- TIM2->CCER &= ~TIM_CCER_CC3P; // Clear CCER register
- TIM2->CCER |= 0x00000001 << 8; // Enable OC3 output
- TIM2->CCMR2 &= ~TIM_CCMR2_OC3M; // Clear CCMR2 register
- TIM2->CCMR2 &= ~TIM_CCMR2_CC3S;
- TIM2->CCMR2 |= TIM_OCMode_PWM1; // Set output mode to PWM1
- TIM2->CCMR2 &= ~TIM_CCMR2_OC3PE;
- TIM2->CCMR2 |= TIM_OCPreload_Enable;
- TIM2->CCR3 = 500; // Set duty cycle to 50 %
- RCC->AHBENR |= RCC_AHBENR_GPIOBEN; // Enable clock line for GPIO bank B
- GPIOB->MODER &= ~(0x00000003 << (10 * 2)); // Clear mode register
- GPIOB->MODER |= (0x00000002 << (10 * 2)); // Set mode register
- GPIO_PinAFConfig(GPIOB, GPIO_PinSource10, GPIO_AF_1);
-
-}
-void setFreq(uint16_t freq) {
- uint32_t reload = 64e6 / freq / (0x027f + 1) - 1;
- TIM2->ARR = reload; // Set auto reload value
- TIM2->CCR3 = reload/2; // Set compare register
- TIM2->EGR |= 0x01;
- }
-void TIM1_BRK_TIM15_IRQHandler(void){
-
-        //Do whatever you want here, but make sure it doesn’t take too much time!
-        // OMREGN TIL SEKUNDER! fra 1/100 dele sek
-        // dette er hvad der sker ved en interrupt i timer 2
-    if (time>=100) {
-            s++;
-            time -= 100;
-            if (s>=60) {
-                m++;
-                //s=0;
-            }
-            if (m>=60) {
-                h++;
-                m=0;
-            }
+int updateSeagull1(int speed) {
+    if ( tmp1 >= speed ){
+        tmp1 = 0;
+        return 1;
     }
-    time++;
-    TIM15->SR &= ~0x0001; // Clear interrupt bit, skal gøre for at kunne bruge interrupt igen.
 
+    else{
+    return 0;
+    }
+}
+
+int updateSeagull2(int speed) {
+    if ( tmp2 >= speed ){
+        tmp2 = 0;
+        return 1;
+    }
+
+    else{
+    return 0;
+    }
+}
+
+int updateShot(int speed) {
+    if ( tmp >= speed ){
+        tmp = 0;
+        return 1;
+    }
+
+    else{
+    return 0;
+    }
 }

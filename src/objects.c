@@ -54,8 +54,8 @@ void death(struct velocityvector * deadObject){
 }
 
 
-void initObjects(struct velocityvector * ship,struct velocityvector * shot,struct box * gameBox, struct velocityvector *  seagull,struct velocityvector * asteroidS, struct velocityvector * asteroidL) {
- // De individuelle structs SKAL initialiseres i main(), men initObject() definerer elementer af structs'ne
+void initObjects(struct velocityvector * ship,struct velocityvector * shot0 ,struct velocityvector * shot1 ,struct velocityvector * shot2 ,struct velocityvector * shot3,struct box * gameBox, struct velocityvector *  seagull,struct velocityvector * asteroidS, struct velocityvector * asteroidL,struct velocityvector powerUp0,struct velocityvector powerUp1,struct velocityvector powerUp2) {
+ // De inadividuelle structs SKAL initialiseres i main(), men initObject() definerer elementer af structs'ne
 
    // SHIP
         ship->vx=0;
@@ -68,14 +68,39 @@ void initObjects(struct velocityvector * ship,struct velocityvector * shot,struc
         ship->alive=1;
         ship->health=2;
 
-    // SHOT
-        shot->x=0;
-        shot->vx=0;
-        shot->y=0;
-        shot->vy=0;
-        shot->alive=0;
-        shot->height=1;
-        shot->width=1;
+    // SHOT0powerUp0
+        shot0->x=0;
+        shot0->vx=0;
+        shot0->y=0;
+        shot0->vy=0;
+        shot0->alive=0;
+        shot0->height=1;
+        shot0->width=1;
+    // SHOT1
+        shot1->x=0;
+        shot1->vx=0;
+        shot1->y=0;
+        shot1->vy=0;
+        shot1->alive=0;
+        shot1->height=1;
+        shot1->width=1;
+    // SHOT2
+        shot2->x=0;
+        shot2->vx=0;
+        shot2->y=0;
+        shot2->vy=0;
+        shot2->alive=0;
+        shot2->height=1;
+        shot2->width=1;
+    // SHOT3
+        shot3->x=0;
+        shot3->vx=0;
+        shot3->y=0;
+        shot3->vy=0;
+        shot3->alive=0;
+        shot3->height=1;
+        shot3->width=1;
+
 
     // GAMEBOX
         gameBox->x1=5;
@@ -117,6 +142,34 @@ void initObjects(struct velocityvector * ship,struct velocityvector * shot,struc
         asteroidL->height=1;
         asteroidL->width=3;
         asteroidL->alive=1;
+    // Powerups
+
+        powerUp0->vx=0;
+        powerUp0->vy=0;
+        powerUp0->x=20;
+        powerUp0->y=20;
+        powerUp0->height=1;
+        powerUp0->width=1;
+        powerUp0->alive=1;
+
+        powerUp1->vx=0;
+        powerUp1->vy=0;
+        powerUp1->x=20;
+        powerUp1->y=20;
+        powerUp1->height=1;
+        powerUp1->width=1;
+        powerUp1->alive=1;
+
+        powerUp2->vx=0;
+        powerUp2->vy=0;
+        powerUp2->x=20;
+        powerUp2->y=20;
+        powerUp2->height=1;
+        powerUp2->width=1;
+        powerUp2->alive=1;
+
+
+
 
 }
 

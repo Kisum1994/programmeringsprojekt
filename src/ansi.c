@@ -85,77 +85,6 @@ void underline(uint8_t on) {
     }
 }
 
-void window(struct box * gameBox) {
-    gotoxy(gameBox->x1,gameBox->y1);
-    int spc = gameBox->y1-1;
-    int j;
-    int i;
-    if (gameBox->style==1) {
-        for (i = 0; i <= gameBox->x2; i++ ) {
-            for (j = 0; j <= gameBox->y2; j++ ) {
-                    if (i == 0 && j == 0) {
-                        printf("%c",201);              // øverst venstre hjørne
-                    }
-                    else if (i == 0 && j == gameBox->y2) {
-                        printf("%c\n%*c",187,spc,' '); // øverst højre hjørne
-                    }
-                    else if (i == gameBox->x2 && j == 0) {
-                        printf("%c",200);               // nederst venstre hjørne
-                    }
-                    else if (i == gameBox->x2 && j == gameBox->y2) {
-                        printf("%c\n%*c",188,spc,' ');  // nederst højre hjørne
-                    }
-                    else if (j==0 && (i !=0 && i!=gameBox->x2 )) {
-                        printf("%c",186);                 // venstre væg
-                    }
-                    else if (j==gameBox->y2 && (i !=0 || i!=gameBox->x2 )) {
-                        printf("%c\n%*c",186,spc,' ');   // højre væg
-                    }
-                    else if ((i == 0 || i == gameBox->x2) && (j !=0 || j != gameBox->y2 ) ) {
-                        printf("%c", 205);               // gulv/loft
-                    }
-                    else {
-                        printf(" ") ;
-                    }
-            }
-        }
-    }
-    else if (gameBox->style==2) {
-        for (i = 0; i <= gameBox->x2; i++ ) {
-            for (j = 0; j <= gameBox->y2; j++ ) {
-                    if (i == 0 && j == 0) {
-                        printf("%c",218);              // øverst venstre hjørne
-                    }
-                    else if (i == 0 && j == gameBox->y2) {
-                        printf("%c\n%*c",191,spc,' '); // øverst højre hjørne
-                    }
-                    else if (i == gameBox->x2 && j == 0) {
-                        printf("%c",192);               // nederst venstre hjørne
-                    }
-                    else if (i == gameBox->x2 && j == gameBox->y2) {
-                        printf("%c\n%*c",217,spc,' ');  // nederst højre hjørne
-                    }
-                    else if (j==0 && (i !=0 && i!=gameBox->x2 )) {
-                        printf("%c",179);                 // venstre væg
-                    }
-                    else if (j==gameBox->y2 && (i !=0 || i!=gameBox->x2 )) {
-                        printf("%c\n%*c",179,spc,' ');   // højre væg
-                    }
-                    else if ((i == 0 || i == gameBox->x2) && (j !=0 || j != gameBox->y2 ) ) {
-                        printf("%c", 196);               // gulv/loft
-                    }
-                    else {
-                        printf(" ") ;
-                    }
-            }
-        }
-    }
-    gotoxy(gameBox->x1,gameBox->y1+2);
-    printf("%c",185);
-    printf(" %s ",gameBox->title);
-    printf("%c",204);
-    gotoxy(1,1);
-}
 
 
 void printFix(int32_t i) {
@@ -198,8 +127,7 @@ struct vector_t {
  //};
 
 int32_t rotatev(struct vector_t *v, int32_t deg) {
-(*v).x=FIX14_MULT((*v).x,calccos(deg))-FIX14_MULT((*v).y,calcsin(deg));
-(*v).y=FIX14_MULT((*v).x,calcsin(deg))+FIX14_MULT((*v).y,calccos(deg));
-return (*v).x, (*v).y;
-
+    (*v).x=FIX14_MULT((*v).x,calccos(deg))-FIX14_MULT((*v).y,calcsin(deg));
+    (*v).y=FIX14_MULT((*v).x,calcsin(deg))+FIX14_MULT((*v).y,calccos(deg));
+    return (*v).x, (*v).y;
 };
