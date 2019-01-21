@@ -33,7 +33,7 @@
 
 
 int main(void) {
-    uart_init( 9600 ); //initialize USB serial emulation at 9600 baud
+    uart_init( 96000 ); //initialize USB serial emulation at 9600 baud
 
     // ryder op på skærmen
     clrscr();
@@ -41,18 +41,22 @@ int main(void) {
 
     //init ur
     initTimer();
-    TIM2->CR1 = 0x0001; //  <-- start timer 2
-    TIM2_IRQHandler();
+    TIM15->CR1 = 0x0001; //  <-- start timer 2
+    TIM1_BRK_TIM15_IRQHandler();
 
     // init structs, deres værdier bliver skrevet i initObjects(); - denne findes i objects.c
 
     struct box gameBox;
     struct velocityvector shot;
     struct velocityvector ship;
-    struct velocityvector seagull;
+    struct velocityvector seagull0;
+    struct velocityvector seagull1;
+    struct velocityvector seagull2;
+    struct velocityvector seagull3;
     struct velocityvector asteroidS;
     struct velocityvector asteroidL;
-    initObjects(&ship,&shot,&gameBox,&seagull,&asteroidS,&asteroidL);
+    initObjects(&ship,&shot,&gameBox,&seagull0,&seagull1,&seagull2,&seagull3,&asteroidS,&asteroidL);
+
 
     printf("\e[?25l"); // gør cursor usynlig
 
@@ -62,6 +66,8 @@ int main(void) {
 
 
     drawBox(&gameBox);
+    moveAsteroid(&asteroidS);
+    moveAsteroid(&asteroidL);
 
     drawShip(&ship);
 
@@ -70,33 +76,39 @@ int main(void) {
     //
 
 while (1) {
-      // styring af skib
-    char str[4]={""}; // denne SKAL deklares i main
-    shipControls(str, &ship, &shot,&gameBox);
+    char str[4]={""};  // denne SKAL deklares i main
+   if(keyboardInput(str)>0) {
 
-     // shotHandler(); -> ??
+    shipControls(str, &ship, &shot, &gameBox);// styring af skib
 
+
+    bossKey(str,&ship,&shot,&gameBox,&seagull0,&seagull1,&seagull2,&seagull3,&asteroidS,&asteroidL);
+   }
+
+    if (moveShot(&shot,&gameBox,3)==1) {
+        // herinde er ting der skal ske samtidig med skudets bevægelse.
+        detectAsteroid(&shot, &asteroidL);
+    }
     if (shot.alive>0) {
-        moveBall(&shot);
-        // indførelse af bounce limit
-        if (detectBarrier(&gameBox,&shot)==1) {
-                shot.alive--;
-                if (shot.alive==0){
-                        death(&shot);
-                }
-        }
-        detectCollsionShip(&shot,&ship);
-        detectCollisionSeagull(&shot,&seagull);
-    }
-    detectCollsionShip(&seagull,&ship);
-   if (getTime()==50) {
-    moveSeagull(&shot,&seagull,&gameBox);
+
+        //Gravity(&shot,&asteroidL);
     }
 
 
+    //detectCollsionShip(&shot,&ship);
+    detectCollisionSeagull(&shot,&seagull0);
 
 
 
+
+    detectCollsionShip(&asteroidL,&ship);
+    //detectCollsionShip(&seagull0,&ship);
+
+    if(updateSeagull1(1)==15){
+        moveSeagull(&shot,&seagull0 ,&gameBox);
+    }
+    detectAsteroid(&seagull0, &asteroidL);
+    detectAsteroid(&seagull0,&asteroidS);
 
 
 
