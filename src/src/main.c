@@ -12,7 +12,8 @@
 
 **********************************************************************/
 
-
+#include <string.h>
+#include <stdio.h>
 #include "stm32f30x_conf.h" // STM32 config
 #include "30010_io.h" // input/output library for this course
 #include "GPIO.h"
@@ -39,6 +40,7 @@ TIM2_IRQHandler();
 
 // init structs, deres værdier bliver skrevet i initObjects(); - denne findes i objects.c
 struct box gameBox;
+struct box gameBoxT;
 struct velocityvector shot;
 struct velocityvector ship;
 struct velocityvector seagull0;
@@ -47,7 +49,6 @@ struct velocityvector seagull2;
 struct velocityvector seagull3;
 struct velocityvector asteroidS;
 struct velocityvector asteroidL;
-initObjects(&ship,&shot,&gameBox,&seagull0,&seagull1,&seagull2,&seagull3,&asteroidS,&asteroidL);
 
 
 
@@ -55,6 +56,7 @@ initObjects(&ship,&shot,&gameBox,&seagull0,&seagull1,&seagull2,&seagull3,&astero
 // ryder op på skærmen
 clrscr();
 gotoxy(0,0);
+
 //Viser splash screen og derefter main menu
 splashScreen();
 // Start først tid når spiller starter
@@ -67,18 +69,60 @@ printf("Pre-alpha stage: Everything you see is subject to change.\n");
 
 
 int won=0;
-int level;
+int level=0;
 int kill;
 while (1){
     if (won == 0 || level>=3){
         level=menuMain();
     }
+    if (level==4){
+    while(1){
+    tutorial();
+    initObjects(&ship,&shot,&gameBoxT,&gameBox,&seagull0,&seagull1,&seagull2,&seagull3,&asteroidS,&asteroidL);
+    drawBox(&gameBoxT);
+    drawShip(&ship);
+    int turn=0, moved=0, shotFired=0;
+        while(turn<7){
+            char str0[4]={""};
+            if(shipControlsTutorialTurn(str0,&ship)==1){
+                turn++;
+            }
+        }
+        gotoxy(64,15);
+        printf("You have succesfully turned the ship. Now try to move the ship\n");
+        while(moved<4){
+            char str1[4]={""};
+            if(shipControlsTutorialMove(str1,&ship)==1){
+                moved++;
+            }
+        }
+        gotoxy(66,15);
+        printf("You have succesfully moved the ship. Now try to shoot with the ship\n");
+        while(shotFired<3){
+            char str2[4]={""};
+            if(shipControlsTutorialShoot(str2,&ship,&shot)==1){
+                shotFired++;
+            }
+            moveShot(&shot,&gameBoxT,3);
+            drawShip(&ship);
+        }
+    gotoxy(68,15);
+    printf("You have completed the tutorial\n");
+    for(int q=0; q<=1<<24;q++){
+    }
+    break;
+    }
+    continue;
+    }
+
     if (won==1){
     level++;
     won=0;
     }
+
     if (level >0){
         kill=0;
+        clrscr();
         if (level==1){
             initLevel1(&ship,&shot,&gameBox,&seagull0,&seagull1,&seagull2,&seagull3,&asteroidS,&asteroidL);
         }
@@ -88,7 +132,6 @@ while (1){
         else if (level==3){
             initLevel3(&ship,&shot,&gameBox,&seagull0,&seagull1,&seagull2,&seagull3,&asteroidS,&asteroidL);
         }
-
     drawBox(&gameBox);
     moveAsteroid(&asteroidS);
     moveAsteroid(&asteroidL);
@@ -96,8 +139,6 @@ while (1){
     drawShip(&ship);
 
     uart_clear();
-
-        //
 
     while (1) {
           // styring af skib
@@ -111,9 +152,9 @@ while (1){
             // herinde er ting der skal ske samtidig med skudets bevægelse.
             //detectAsteroid(&shot, &asteroidL);
         }
-        if (shot.alive>0) {
+        /*if (shot.alive>0) {
             Gravity(&shot,&asteroidL);
-        }
+        }*/
 
         // indfør evt. if Alive til tjek om collision
       /*  detectCollisionSeagull(&ship,&seagull0);
@@ -123,18 +164,18 @@ while (1){
         detectCollsionShip(&shot,&ship); */
 
         if(detectCollisionSeagull(&shot,&seagull0)==1){
-                        kill++;
+            kill++;
         }
 
-                        if(detectCollisionSeagull(&shot,&seagull3)==1){
-                            kill++;
-                        }
-                        if(detectCollisionSeagull(&shot,&seagull1)==1){
-                            kill++;
-                        }
+        if(detectCollisionSeagull(&shot,&seagull3)==1){
+            kill++;
+        }
+        if(detectCollisionSeagull(&shot,&seagull1)==1){
+            kill++;
+        }
 
-                        if(detectCollisionSeagull(&shot,&seagull2)==1){
-                            kill++;
+        if(detectCollisionSeagull(&shot,&seagull2)==1){
+            kill++;
         }
 
         detectCollsionShip(&asteroidL,&ship);
@@ -237,7 +278,7 @@ while (1){
         printf("You have passed level 3 and have won the game");
         for(int q=0; q<=1<<24;q++){
             }
-        won=1;
+        won=0;
         break;
     }
     }

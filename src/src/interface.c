@@ -91,7 +91,7 @@ int menuMain(){
     if (choice==3){
             printf("introduction\n");
             // køre en tutorial??
-            return 1;
+            return 4;
     }
     if (choice==4){
             clrscr();
@@ -302,4 +302,56 @@ void splashScreen() { // ændr puttys vindue til 175 "columns" og 70 "rows" i /ch
                  break;
          }
      }
+}
+
+
+
+void tutorial(){
+clrscr();
+int n=15;
+int x=0;
+gotoxy(x,n);
+printf("  _   _                 _                _             ");
+gotoxy(x+1,n);
+printf(" | | | | _____      __ | |_ ___    _ __ | | __ _ _   _ ");
+gotoxy(x+2,n);
+printf(" | |_| |/ _ \ \ /\ / / | __/ _ \  | '_ \| |/ _` | | | |");
+gotoxy(x+3,n);
+printf(" |  _  | (_) \ V  V /  | || (_) | | |_) | | (_| | |_| |");
+gotoxy(x+5,n);
+printf(" |_| |_|\___/ \_/\_/    \__\___/  | .__/|_|\__,_|\__, |");
+gotoxy(x+6,n);
+printf("                                  |_|            |___/ ");
+
+gotoxy(x+10,n);
+printf("The goal of the game is to shoot the space seagulls, as the one seen below:");
+// måge position står
+gotoxy(x+15,n+25);
+printf("%c%c%c%c%c%c%c%c%c",' ',' ',47,92,' ',47,92,' ',' ');
+gotoxy(x+16,n+25);
+printf("%c%c%c%c%c%c%c%c%c",' ',35,' ',' ',153,' ',' ',35,' ');
+gotoxy(x+17,n+25);
+printf("%c%c%c%c%c%c%c%c%c",' ', 118,' ',' ',35,' ',' ',118,' ');
+
+gotoxy(x+20,n);
+printf("_______________________________________________________________");
+gotoxy(x+23,n);
+printf("To control the ship you use the arrows and space on the keyboard");
+
+gotoxy(x+25,n);
+printf("If the right arrow is pressed the ship rotates clockwise");
+//gotoxy(x+22,n);
+//printf("_______________________________________________________________");
+gotoxy(x+27,n);
+printf("If the left arrow is pressed the ship rotates counter clockwise");
+//gotoxy(x+23,n);
+//printf("_______________________________________________________________");
+gotoxy(x+29,n);
+printf("If the up arrow is pressed the ship moves forward");
+//gotoxy(x+26,n);
+//printf("_______________________________________________________________");
+gotoxy(x+31,n);
+printf("If space is pressed the ship shoots");
+//gotoxy(x+29,n);
+//printf("_______________________________________________________________");
 }

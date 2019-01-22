@@ -20,6 +20,7 @@
 void death(struct velocityvector * deadObject){
         int xc;
         int yc;
+        if(deadObject->alive>0){
         // printer "blank" på dens position
         //hvis skud
         if (deadObject->width==1) {
@@ -69,17 +70,18 @@ void death(struct velocityvector * deadObject){
 
         deadObject->ang=0;
         deadObject->alive=0;
+    }
 }
 
 
-void initObjects(struct velocityvector * ship,struct velocityvector * shot,struct box * gameBox, struct velocityvector * seagull0,struct velocityvector * seagull1,struct velocityvector * seagull2,struct velocityvector * seagull3,struct velocityvector * asteroidS, struct velocityvector * asteroidL) {
+void initObjects(struct velocityvector * ship,struct velocityvector * shot,struct box * gameBoxT,struct box * gameBox, struct velocityvector * seagull0,struct velocityvector * seagull1,struct velocityvector * seagull2,struct velocityvector * seagull3,struct velocityvector * asteroidS, struct velocityvector * asteroidL) {
  // De individuelle structs SKAL initialiseres i main(), men initObject() definerer elementer af structs'ne
 
    // SHIP
         ship->vx=0;
         ship->vy=0;
-        ship->x=25;
-        ship->y=25;
+        ship->x=47;
+        ship->y=45;
         ship->ang=0;
         ship->height=3;
         ship->width=3;
@@ -93,6 +95,14 @@ void initObjects(struct velocityvector * ship,struct velocityvector * shot,struc
         shot->height=1;
         shot->width=1;
         shot->alive=0;
+
+    // Tutorial GAMEBOX
+        gameBoxT->x1=37;
+        gameBoxT->x2=57;  //standard for fullscreen: 70
+        gameBoxT->y1=35;
+        gameBoxT->y2=60;  //standard for fullscreen: 170
+        strcpy(gameBoxT->title,"Tutorial box" ); // Husk at gøre definationen af title[x] i objects.h længere, hvis stringen er længere
+        gameBoxT->style=1;
 
     // GAMEBOX
         gameBox->x1=5;
@@ -492,6 +502,7 @@ void shipControls(char * str,struct velocityvector * ship,struct velocityvector 
                 }
                 draw=1;
             }
+
             if(arrowInput(str)==0x01){
                 shoot(shot,ship);
             }
@@ -538,6 +549,106 @@ void shipControls(char * str,struct velocityvector * ship,struct velocityvector 
             }
         }
 
+    }
+}
+
+
+int shipControlsTutorialTurn(char * str,struct velocityvector * ship) {
+// char str[4]={""};   <-- denne SKAL defineres i main
+    int draw=0;
+    int moved=0;
+
+ /*   if (ship->alive==1){
+*/
+       if (keyboardInput(str)>0) {
+            if (arrowInput(str)==4) { // venstre rotation af skib
+                ship->ang++;
+                if (ship->ang >=8) {
+                    ship->ang=0;
+                }
+                draw=1;
+            }
+            else if (arrowInput(str)==8){ //højre rotation af skib
+                ship->ang--;
+
+                if (ship->ang<0) {
+                    ship->ang=7;
+                }
+                draw=1;
+
+            }
+            if (draw==1) {
+                drawShip(ship);
+                draw=0;
+                return 1;
+            }
+       }
+}
+
+int shipControlsTutorialMove(char * str,struct velocityvector * ship) {
+// char str[4]={""};   <-- denne SKAL defineres i main
+    int draw=0;
+    int moved=0;
+
+ /*   if (ship->alive==1){
+*/
+       if (keyboardInput(str)>0) {
+            if (arrowInput(str)==4) { // venstre rotation af skib
+                ship->ang++;
+                if (ship->ang >=8) {
+                    ship->ang=0;
+                }
+                draw=1;
+            }
+            else if (arrowInput(str)==8){ //højre rotation af skib
+                ship->ang--;
+
+                if (ship->ang<0) {
+                    ship->ang=7;
+                }
+                draw=1;
+            }
+            // Denne kan tændes hvis skibet skal kunne bevæge sig fremad i dens retning
+        if (arrowInput(str)==16){
+                    draw=1;
+                    moved=1;
+                    if (ship->ang==7 || ship->ang==0 || ship->ang==1) {
+                        ship->x--;
+                        ship->vx=-1;
+                    }
+                    if (ship->ang==1 || ship->ang==2 || ship->ang==3) {
+                        ship->y--;
+                        ship->vy=-1;
+                    }
+                    if (ship->ang==3 || ship->ang==4 || ship->ang==5) {
+                        ship->x++;
+                        ship->vx=1;
+                    }
+                    if (ship->ang==5 || ship->ang==6 || ship->ang==7) {
+                        ship->y++;
+                        ship->vy=1;
+                    }
+                }
+
+            if (draw==1) {
+                drawShip(ship);
+                draw=0;
+                if (moved==1) {
+                   cleanShip(ship);
+                    return 1;
+                }
+            }
+    }
+}
+
+int shipControlsTutorialShoot(char * str,struct velocityvector * ship,struct velocityvector * shot){
+    if (keyboardInput(str)>0) {
+            if(arrowInput(str)==1){
+                shoot(shot,ship);
+                return 1;
+            }
+            else{return 0;
+            }
     }
 }
 
@@ -642,33 +753,7 @@ int detectBarrier( struct box * gameBox, struct velocityvector * velovector){
     }
     else return 0;
 }
-/*
-int detectAsteroid(struct velocityvector * velovector,struct velocityvector * asteroid){
-    int bounce=0; // XOR-> (!((exp1)||(exp2)) || (exp1) && (exp2))
 
-    if((velovector->x+velovector->vx+((velovector->height-1)/2)  >=  asteroid->x+asteroid->vx-((asteroid->height-1)/2))  && velovector->x <= asteroid->x) {
-
-            velovector->vx=velovector->vx*(-1);
-            bounce=1;
-    }
-    else if ((velovector->x+velovector->vx-((velovector->height-1)/2) <=  asteroid->x+asteroid->vx+((asteroid->height-1)/2)) && velovector->x >= asteroid->x ){
-            velovector->vx=velovector->vx*(-1);
-            bounce=1;
-    }
-   /* if (velovector->y+velovector->vy+((velovector->width)/2)  >=  asteroid->y+asteroid->vy-((asteroid->width-1)/2)  ){
-            velovector->vy=velovector->vy*(-1);
-            bounce=1;
-    }
-    if (velovector->y+velovector->vy-((velovector->width)/2)  <=  asteroid->y+asteroid->vy+((asteroid->width-1)/2)  ){
-            velovector->vy=velovector->vy*(-1);
-            bounce=1;
-    }
-    if (bounce==1) {
-            return 1;
-    }
-    else return 0;
-}
-*/
 
 void shoot(struct velocityvector * shot,struct velocityvector * ship) {
     if (shot->alive<1) {
@@ -763,14 +848,16 @@ int detectCollsionShip( struct velocityvector * obj1,struct velocityvector * shi
 }
 
 int detectCollisionSeagull( struct velocityvector * obj1 ,struct velocityvector * seagull){
-    if (detectCollision(obj1,seagull)==1) {
-        death(seagull);
-        death(obj1);
-        return 1;
+    if (seagull->alive>0){
+        if (detectCollision(obj1,seagull)==1) {
+            death(seagull);
+            death(obj1);
+            return 1;
+        }
     }
-    else {
-        return 0;
-    }
+        else {
+            return 0;
+        }
 }
 
 int detectCollsionAsteroid( struct velocityvector * obj1,struct velocityvector * asteroid) {
@@ -1094,7 +1181,7 @@ void cleanAsteroid(struct velocityvector * asteroid){
         }
 }
 
-void deleteAsteroid(struct velocityvector * asteroid ){ // skal bare køres via death !hvis altså en asteroide skal kunne dø!
+/*void deleteAsteroid(struct velocityvector * asteroid ){ // skal bare køres via death !hvis altså en asteroide skal kunne dø!
     int x,y;
     if (asteroid->width==5){
         x=asteroid->x-asteroid->vx-1;
@@ -1116,7 +1203,7 @@ void deleteAsteroid(struct velocityvector * asteroid ){ // skal bare køres via d
             gotoxy(x+2,y);
             printf("%*c",5,' ');
     }
-}
+}*/
 
 
 void drawSeagull(struct velocityvector * seagull){
@@ -1159,17 +1246,6 @@ void cleanSeagull(struct velocityvector * seagull){
     if (seagull->vx > 0 || seagull->vx < 0){
         gotoxy(x,y);
         printf("%*c",7,' ');
-    }
-}
-
-
-
-int numXOR(int32_t num1,int32_t num2) {
-    if  ((num1+num2)/2==num1) {
-        return 0;
-    }
-    else if (num1 != num2) {
-            return 1;
     }
 }
 

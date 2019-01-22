@@ -116,18 +116,14 @@ int32_t input = ((deg+90)*512)/360;
 return (int32_t)(sinus[input&0x1FF]);
 }
 
-struct vector_t {
- int32_t x, y;
+
+/*void initVector(struct vector_t *v) {
+ (*v).x = -4<<14;
+ (*v).y = 2<<14;
  };
-
-
-//void initVector(struct vector_t *v) {
- //(*v).x = -4<<14;
- //(*v).y = 2<<14;
- //};
 
 int32_t rotatev(struct vector_t *v, int32_t deg) {
     (*v).x=FIX14_MULT((*v).x,calccos(deg))-FIX14_MULT((*v).y,calcsin(deg));
     (*v).y=FIX14_MULT((*v).x,calcsin(deg))+FIX14_MULT((*v).y,calccos(deg));
     return (*v).x, (*v).y;
-};
+};*/
