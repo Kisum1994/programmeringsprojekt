@@ -205,7 +205,7 @@ int menuLevel(){
 
 
 
-int bossKey(char * str, struct velocityvector * ship,struct velocityvector * shot,struct box * gameBox, struct velocityvector * seagull0,struct velocityvector * seagull1,struct velocityvector * seagull2,struct velocityvector * seagull3,struct velocityvector * asteroidS, struct velocityvector * asteroidL){
+int bossKey(char * str, struct velocityvector * ship,struct velocityvector * shot0,struct box * gameBox, struct velocityvector * seagull0,struct velocityvector * seagull1,struct velocityvector * seagull2,struct velocityvector * seagull3,struct velocityvector * asteroidS, struct velocityvector * asteroidL){
 
 
         if (arrowInput(str)==0x30){
@@ -243,8 +243,8 @@ int bossKey(char * str, struct velocityvector * ship,struct velocityvector * sho
                     if (asteroidL->alive==1){
                         drawAsteroid(asteroidL);
                     }
-                    if(shot->alive==1){
-                        moveShot(shot);
+                    if(shot0->alive==1){
+                        moveShot(shot0);
                     }
                     break;
                 }

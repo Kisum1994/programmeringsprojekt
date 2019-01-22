@@ -18,6 +18,8 @@
     int tmp;
     int tmp1;
     int tmp2;
+    int tmpshot0;
+    int tmpshot1;
 
 
 int getTime() {return time;}
@@ -280,6 +282,8 @@ void TIM1_BRK_TIM15_IRQHandler(void){
     tmp++;
     tmp1++;
     tmp2++;
+    tmpshot0++;
+    tmpshot1++;
 
     TIM15->SR &= ~0x0001; // Clear interrupt bit, skal gøre for at kunne bruge interrupt igen.
 
@@ -509,9 +513,19 @@ int updateSeagull2(int speed) {
     }
 }
 
-int updateShot(int speed) {
-    if ( tmp >= speed ){
-        tmp = 0;
+int updateShot0(int speed) {
+    if ( tmpshot0 >= speed ){
+        tmpshot0 = 0;
+        return 1;
+    }
+
+    else{
+    return 0;
+    }
+}
+int updateShot1(int speed) {
+    if ( tmpshot1 >= speed ){
+        tmpshot1 = 0;
         return 1;
     }
 
