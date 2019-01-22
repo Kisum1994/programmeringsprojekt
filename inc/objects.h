@@ -19,6 +19,10 @@ struct velocityvector{
         int height;
         int G;
         int time;
+        int impulseX;
+        int impulseY;
+        int enabled;
+
 
 };
 

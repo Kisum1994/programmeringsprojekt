@@ -18,6 +18,11 @@
     int tmp;
     int tmp1;
     int tmp2;
+    int tmp3;
+    int tmpshot0;
+    int tmpshot1;
+    int tmpshot2;
+
 
 
 int getTime() {return time;}
@@ -28,6 +33,7 @@ int getM() {return m;}
 int getH() {return h;}
 int getTMP() {return tmp;}
 int getTMP2() {return tmp2;}
+int getTMP3() {return tmp3;}
 
 void initJoystick () {
  RCC->AHBENR |= RCC_AHBPeriph_GPIOA;
@@ -280,6 +286,10 @@ void TIM1_BRK_TIM15_IRQHandler(void){
     tmp++;
     tmp1++;
     tmp2++;
+    tmp3++;
+    tmpshot0++;
+    tmpshot1++;
+    tmpshot2++;
 
     TIM15->SR &= ~0x0001; // Clear interrupt bit, skal gøre for at kunne bruge interrupt igen.
 
@@ -492,9 +502,8 @@ int updateSeagull1(int speed) {
         tmp1 = 0;
         return 1;
     }
-
     else{
-    return 0;
+        return 0;
     }
 }
 
@@ -503,19 +512,48 @@ int updateSeagull2(int speed) {
         tmp2 = 0;
         return 1;
     }
+    else{
+        return 0;
+    }
+}
 
+int updateShot0(int speed) {
+    if ( tmpshot0 >= speed ){
+        tmpshot0 = 0;
+        return 1;
+    }
     else{
     return 0;
     }
 }
 
-int updateShot(int speed) {
-    if ( tmp >= speed ){
-        tmp = 0;
+int updateShot1(int speed) {
+    if ( tmpshot1 >= speed ){
+        tmpshot1 = 0;
         return 1;
     }
-
     else{
     return 0;
+    }
+}
+
+int updateShot2(int speed) {
+    if ( tmpshot1 >= speed ){
+        tmpshot1 = 0;
+        return 1;
+    }
+    else{
+    return 0;
+    }
+}
+
+
+int updateShip(int speed) {
+    if ( tmp3 >= speed ){
+        tmp3 = 0;
+        return 1;
+    }
+    else{
+        return 0;
     }
 }
