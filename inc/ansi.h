@@ -14,4 +14,5 @@ void clrscr(void);
 void clreol(void);
 void underline(uint8_t on);
 
+
 #endif /* _ANSI_H_ */

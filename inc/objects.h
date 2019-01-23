@@ -17,6 +17,7 @@ struct velocityvector{
         int ani;
         int width;
         int height;
+        int G;
 
 };
 
@@ -32,11 +33,11 @@ struct box{
    // FUNKTIONER
 
 void death(struct velocityvector * deadObject);
-void initObjects(struct velocityvector * ship,struct velocityvector * shot,struct box * gameBox, struct velocityvector * seagull,struct velocityvector * asteroidS, struct velocityvector * asteroidL);
+void initObjects(struct velocityvector * ship,struct velocityvector * shot,struct box * gameBoxT,struct box * gameBox, struct velocityvector * seagull0,struct velocityvector * seagull1,struct velocityvector * seagull2,struct velocityvector * seagull3,struct velocityvector * asteroidS, struct velocityvector * asteroidL);
 
 void shipControls(char * str,struct velocityvector * ship,struct velocityvector * shot,struct box * gameBox);
 void updateVelocityVector(struct  velocityvector * velovector);
-void moveBall(struct velocityvector * velovector);
+int moveShot(struct velocityvector * shot,struct box * gameBox, int speed);
 int detectBarrier( struct box * gameBox, struct velocityvector * velovector);
 void shoot(struct velocityvector * shot,struct velocityvector * ship);
 int detectCollision(struct velocityvector * obj1,struct velocityvector * obj2);
