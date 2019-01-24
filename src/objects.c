@@ -23,6 +23,7 @@ void death(struct velocityvector * deadObject){
     int xc;
     int yc;
     if(deadObject->alive>0){
+
         // printer "blank" på dens position
         //hvis skud
         if (deadObject->width==1) {
@@ -32,10 +33,32 @@ void death(struct velocityvector * deadObject){
             deadObject->x=0;
             deadObject->y=0;
         }
+
+        if (deadObject->width==3 && deadObject->enabled==1){
+            xc=deadObject->x-1;
+            yc=deadObject->y-1;
+            gotoxy(xc,yc);
+            printf("%*c",3,' ');
+            gotoxy(xc+1,yc);
+            printf("%*c",3,' ');
+            gotoxy(xc+2,yc);
+            printf("%*c",3,' ');
+        }
+
+
+
         // hvis skib
         if (deadObject->width==3 && deadObject->time==0){
             deadObject->alive--;
-            deadObject->time=20; // tiendedele sekunder - iFrames
+            setFreq(587);
+            for(int q=0; q<=1<<19;q++){
+            }
+            setFreq(523);
+            for(int q=0; q<=1<<20;q++){
+            }
+            setFreq(0);
+            deadObject->time=20;// tiendedele sekunder - iFrames
+            drawShip(deadObject);
             if (deadObject->alive==0) {
                 xc=deadObject->x-1;
                 yc=deadObject->y-1;
@@ -60,14 +83,29 @@ void death(struct velocityvector * deadObject){
         }
         // hvis måge
         if (deadObject->width==9) {
+            setFreq(2093);
+            for(int q=0; q<=1<<19;q++){
+            }
+            setFreq(0);
             xc=deadObject->x-1;
             yc=deadObject->y-4;
-            gotoxy(xc,yc);
-            printf("%*c",9,' ');
-            gotoxy(xc+1,yc);
-            printf("%*c",9,' ');
-            gotoxy(xc+2,yc);
-            printf("%*c",9,' ');
+            while(1){
+                    gotoxy(xc,yc);
+                    printf("%c%c%c%c%c%c%c%c%c",45,242,47,35,171,242,47,45,242);
+                    gotoxy(xc+1,yc);
+                    printf("%c%c%c%c%c%c%c%c%c",171,' ',' ',' ',35,' ',' ',' ',123);
+                    gotoxy(xc+2,yc);
+                    printf("%c%c%c%c%c%c%c%c%c",59,' ',' ',' ',37,' ',' ',' ',92);
+                    if (updateSeagull1(30)==1){
+                        gotoxy(xc,yc);
+                        printf("%*c",9,' ');
+                        gotoxy(xc+1,yc);
+                        printf("%*c",9,' ');
+                        gotoxy(xc+2,yc);
+                        printf("%*c",9,' ');
+                        break;
+                    }
+            }
             deadObject->alive=0;
             deadObject->x=0;
             deadObject->y=0;
@@ -111,6 +149,7 @@ void initObjects(struct velocityvector * ship,
         ship->alive=0;
         ship->impulseX=0;
         ship->impulseY=0;
+        ship->time=0;
 
     // SHOT0
         shot0->x=0;
@@ -170,6 +209,8 @@ void initObjects(struct velocityvector * ship,
         seagull0->ani=0; // 1 = vinger ude, og 0= vinger inde
         seagull0->impulseX=0; //
         seagull0->impulseY=0;
+        seagull0->time=0;
+
     // MÅGE 1
 
         seagull1->x=0;
@@ -183,6 +224,8 @@ void initObjects(struct velocityvector * ship,
         seagull1->ani=0; // 1 = vinger ude, og 0= vinger inde
         seagull1->impulseX=0; //
         seagull1->impulseY=0;
+        seagull1->time=0;
+
     // MÅGE 2
 
         seagull2->x=0;
@@ -196,6 +239,7 @@ void initObjects(struct velocityvector * ship,
         seagull2->ani=0; // 1 = vinger ude, og 0= vinger inde
         seagull2->impulseX=0; //
         seagull2->impulseY=0;
+        seagull2->time=0;
 
     // MÅGE 3
 
@@ -210,6 +254,7 @@ void initObjects(struct velocityvector * ship,
         seagull3->ani=0; // 1 = vinger ude, og 0= vinger inde
         seagull3->impulseX=0; //
         seagull3->impulseY=0;
+        seagull3->time=0;
 
 	// ASTEROIDR
         // Asteroid Small
@@ -278,7 +323,7 @@ void initTutorial(struct velocityvector * ship,
         ship->ang=0;
         ship->height=3;
         ship->width=3;
-        ship->alive=1;
+        ship->alive=10;
         ship->impulseX=0;
         ship->impulseY=0;
 
@@ -292,16 +337,15 @@ void initTutorial(struct velocityvector * ship,
         shot0->width=1;
         shot0->impulseX=0;
         shot0->impulseY=0;
-        shot0->time=1000;
+        shot0->time=0;
 
     // GAMEBOX
         gameBox->x1=37;
         gameBox->x2=57;  //standard for fullscreen: 70
         gameBox->y1=35;
         gameBox->y2=60;  //standard for fullscreen: 170
-        strcpy(gameBox->title,"Tutorial" ); // Husk at gøre definationen af title[x] i objects.h længere, hvis stringen er længere
+        strcpy(gameBox->title,"Tutorial Sandbox" ); // Husk at gøre definationen af title[x] i objects.h længere, hvis stringen er længere
         gameBox->style=1;
-
 
 }
 
@@ -561,8 +605,8 @@ void initLevel2(struct velocityvector * ship,
 
         seagull0->x=10;
         seagull0->y=20;
-        seagull0->vy=-1;
-        seagull0->vx=-1;
+        seagull0->vy=1;
+        seagull0->vx=1;
         seagull0->alive=1;
         seagull0->width=9;
         seagull0->height=3;
@@ -638,6 +682,7 @@ void initLevel2(struct velocityvector * ship,
         powerUp0->height=3;
         powerUp0->width=3;
         powerUp0->alive=0;
+        powerUp0->time=0;
 
 
         powerUp1->vx=0;
@@ -647,6 +692,7 @@ void initLevel2(struct velocityvector * ship,
         powerUp1->height=3;
         powerUp1->width=3;
         powerUp1->alive=0;
+        powerUp1->time=0;
 
 
         powerUp2->vx=0;
@@ -656,6 +702,7 @@ void initLevel2(struct velocityvector * ship,
         powerUp2->height=3;
         powerUp2->width=3;
         powerUp2->alive=0;
+        powerUp2->time=0;
 
 }
 
@@ -750,7 +797,7 @@ void initLevel3(struct velocityvector * ship,
         seagull1->y=40;
         seagull1->vy=1;
         seagull1->vx=1;
-        seagull1->alive=1;
+        seagull1->alive=0;
         seagull1->width=9;
         seagull1->height=3;
         seagull1->ang=0; //
@@ -762,7 +809,7 @@ void initLevel3(struct velocityvector * ship,
         seagull2->y=50;
         seagull2->vy=-1;
         seagull2->vx=-1;
-        seagull2->alive=1;
+        seagull2->alive=0;
         seagull2->width=9;
         seagull2->height=3;
         seagull2->ang=0; //
@@ -774,7 +821,7 @@ void initLevel3(struct velocityvector * ship,
         seagull3->y=80;
         seagull3->vy=-1;
         seagull3->vx=-1;
-        seagull3->alive=1;
+        seagull3->alive=0;
         seagull3->width=9;
         seagull3->height=3;
         seagull3->ang=0; //
@@ -1078,7 +1125,7 @@ int shipControlsTutorialShoot(char * str,struct velocityvector * ship,struct vel
 }
 
 void moveShip(struct velocityvector * ship,struct box * gameBox) {
-            int angOld;
+            static int angOld;
             // "friktion" fjerner impuls
             if (updateShip1(10)==1 && ship->enabled==0) {
                 if (ship->time>0){
@@ -1237,7 +1284,7 @@ int moveShot(struct velocityvector * shot,struct box * gameBox,struct velocityve
     }
 };
 
-void moveSeagull(struct velocityvector * seagull, struct box * gameBox,struct velocityvector * asteroidL,struct velocityvector * asteroidS){
+void moveSeagull(struct velocityvector * seagull, struct box * gameBox,struct velocityvector * asteroidL,struct velocityvector * asteroidS,struct velocityvector *powerUp){
     if (seagull->alive==1){
              // for mågen behøves vy ikke, men kan være nødvendig for andre objekter.
             int32_t vxold=seagull->vx;// forrige hastighed gemmes så dan kan sammenlignes med den nye
@@ -1247,6 +1294,7 @@ void moveSeagull(struct velocityvector * seagull, struct box * gameBox,struct ve
             detectBarrier(gameBox,seagull);
             detectAsteroid(seagull,asteroidL);
             detectAsteroid(seagull,asteroidS);
+            detectAsteroid(seagull,powerUp);
 
             if (seagull->ani==1) {
                 updateVelocityVector(seagull);
@@ -1367,7 +1415,6 @@ int detectAsteroid(struct velocityvector * velovector,struct velocityvector * as
                 }
         }
         if (bouncex==1 || bouncey==1) {
-                drawAsteroid(asteroid);
                 return 1;
 
         }
@@ -1387,52 +1434,52 @@ void shoot(struct velocityvector * shot,struct velocityvector * ship) {
 
      // detect collisions med shot inden i, skal sætte shot->alive=0;
     if(ship->ang==0){
-                shot->x=ship->x-2;
+                shot->x=ship->x-3;
                 shot->y=ship->y;
-                shot->impulseX=-impulse;
-                shot->impulseY=0;
+                shot->impulseX=-impulse+ship->impulseX;
+                shot->impulseY=0+ship->impulseY;
     }
     else if(ship->ang==1){
-                shot->x=ship->x-2;
-                shot->y=ship->y-2;
-                shot->impulseX=-impulse;
-                shot->impulseY=-impulse;
+                shot->x=ship->x-3;
+                shot->y=ship->y-3;
+                shot->impulseX=-impulse+ship->impulseX;
+                shot->impulseY=-impulse+ship->impulseY;
     }
     else if(ship->ang==2){
                 shot->x=ship->x;
-                shot->y=ship->y-2;
-                shot->impulseX=0;
-                shot->impulseY=-impulse;
+                shot->y=ship->y-3;
+                shot->impulseX=0+ship->impulseX;
+                shot->impulseY=-impulse+ship->impulseY;
     }
     else if(ship->ang==3){
-                shot->x=ship->x+2;
-                shot->y=ship->y-2;
-                shot->impulseX=impulse;
-                shot->impulseY=-impulse;
+                shot->x=ship->x+3;
+                shot->y=ship->y-3;
+                shot->impulseX=impulse+ship->impulseX;
+                shot->impulseY=-impulse+ship->impulseY;
     }
     else if(ship->ang==4){
-                shot->x=ship->x+2;
+                shot->x=ship->x+3;
                 shot->y=ship->y;
-                shot->impulseX=impulse;
-                shot->impulseY=0;
+                shot->impulseX=impulse+ship->impulseX;
+                shot->impulseY=0+ship->impulseY;
     }
     else if(ship->ang==5){
-                shot->x=ship->x+2;
-                shot->y=ship->y+2;
-                shot->impulseX=impulse;
-                shot->impulseY=impulse;
+                shot->x=ship->x+3;
+                shot->y=ship->y+3;
+                shot->impulseX=impulse+ship->impulseX;
+                shot->impulseY=impulse+ship->impulseY;
     }
     else if(ship->ang==6){
                 shot->x=ship->x;
-                shot->y=ship->y+2;
-                shot->impulseX=0;
-                shot->impulseY=impulse;
+                shot->y=ship->y+3;
+                shot->impulseX=0+ship->impulseX;
+                shot->impulseY=impulse+ship->impulseY;
     }
     else if(ship->ang==7){
-                shot->x=ship->x-2;
-                shot->y=ship->y+2;
-                shot->impulseX=-impulse;
-                shot->impulseY=impulse;
+                shot->x=ship->x-3;
+                shot->y=ship->y+3;
+                shot->impulseX=-impulse+ship->impulseX;
+                shot->impulseY=impulse+ship->impulseY;
     }
 }
 }
@@ -1472,7 +1519,7 @@ int detectCollision(struct velocityvector * obj1,struct velocityvector * obj2){
 int detectCollsionShip( struct velocityvector * obj1,struct velocityvector * ship) {
     if (detectCollision(obj1,ship)==1) {
         death(ship);
-       if (obj1->time>0){
+       if (obj1->time>0){ //hvis det er et skud, og ikke en måge
             death(obj1);
        }
         return 1;
@@ -1482,11 +1529,13 @@ int detectCollsionShip( struct velocityvector * obj1,struct velocityvector * shi
     }
 }
 
-int detectCollisionSeagull( struct velocityvector * obj1 ,struct velocityvector * seagull){
+int detectCollisionSeagull( struct velocityvector * seagull ,struct velocityvector * obj1){
     if (seagull->alive > 0) {
         if (detectCollision(obj1,seagull)==1) {
-            death(seagull);
             death(obj1);
+            if (obj1->width==1) {
+                death(seagull);
+            }
             return 1;
         }
     }
@@ -1604,19 +1653,23 @@ void drawBox(struct box * gameBox) {
     }
 
     // skriver title
-
+ /*
     gotoxy(gameBox->x1,gameBox->y1+2);
     printf("%c",185);
     printf(" %s ", gameBox->title);
     printf("%c",204);
     gotoxy(1,1);
+    */
 }
 
 
 void drawShip(struct velocityvector * ship) {
         int xc=ship->x-1;
         int yc=ship->y-1;
-        gotoxy(xc,yc);
+    gotoxy(xc,yc);
+    if (ship->time>0) {  //blinker kun når skip er i iFrames
+       printf("\e[5m");
+    }
     if (ship->ang==0) {
         printf("%c%c%c",' ',94,' ');
         gotoxy(xc+1,yc);
@@ -1673,6 +1726,7 @@ void drawShip(struct velocityvector * ship) {
         gotoxy(xc+2,yc);
         printf("%c%c%c",43,43,' ');
     }
+    printf("\e[25m"); // slukker altid blink
 }
 
 void cleanShip(struct velocityvector * ship) {
@@ -1719,7 +1773,7 @@ void drawAsteroid(struct velocityvector * asteroid){
     }
 }
 
-void cleanAsteroid(struct velocityvector * asteroid){
+void cleanAsteroid(struct velocityvector * asteroid){ // ikke brugt da asteroider ike bevæger sig
     int xold = asteroid->x-asteroid->vx;
     int yold = asteroid->y-asteroid->vy;
     int x,y;
@@ -1857,7 +1911,14 @@ void drawPowerUp(struct velocityvector * powerUp){
 
 
 int enablePowerUp(struct velocityvector * ship, struct velocityvector * powerUp, int rgb[3]){
-    if(detectCollision(ship,powerUp)==1){
+    if(detectCollision(ship,powerUp)==1 && powerUp->enabled==0){
+        setFreq(880);
+        for(int q=0; q<=1<<18;q++){
+        }
+        setFreq(1320);
+        for(int q=0; q<=1<<18;q++){
+        }
+        setFreq(0);
         powerUp->enabled=1;
         death(powerUp);
         rgb[0]=0;

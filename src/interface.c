@@ -35,44 +35,46 @@ int menuMain(){
 
     while (1) {
         char str[4]={""};
-        keyboardInput(str);
-        if (arrowInput(str)==0x20) {
-                px=px+2;
-                gotoxy(px-2,n-2);
-                printf("%c",' ');
-        }
-        if (px>x+10){// wrap around fra bunden
-                px=x+3;
-        }
+        if (keyboardInput(str)>0) {
+            if (arrowInput(str)==0x20) {
+                    px=px+2;
+                    gotoxy(px-2,n-2);
+                    printf("%c",' ');
+            }
+            if (px>x+10){// wrap around fra bunden
+                    px=x+3;
+            }
 
 
-        if (arrowInput(str)==0x10){
-                px=px-2;
-                gotoxy(px+2,n-2);
-                printf("%c",' ');
-        }
-        if (px<x+2){  //wrap around fra bunden
-                px=x+9;
-        }
-        gotoxy(px,n-2);
-        printf("%c",219);
-        if (arrowInput(str)==0x30){
-                if (px==x+3){
-                        choice=1;
-                        break;
-                }
-                if (px==x+5){
-                        choice=2;
-                        break;
-                }
-                if (px==x+7){
-                        choice=3;
-                        break;
-                }
-                if (px==x+9){
-                        choice=4;
-                        break;
-                }
+            if (arrowInput(str)==0x10){
+                    px=px-2;
+                    gotoxy(px+2,n-2);
+                    printf("%c",' ');
+            }
+            if (px<x+2){  //wrap around fra bunden
+                    px=x+9;
+            }
+            gotoxy(px,n-2);
+            printf("%c",219);
+
+            if (arrowInput(str)==0x30){
+                    if (px==x+3){
+                            choice=1;
+                            break;
+                    }
+                    if (px==x+5){
+                            choice=2;
+                            break;
+                    }
+                    if (px==x+7){
+                            choice=3;
+                            break;
+                    }
+                    if (px==x+9){
+                            choice=4;
+                            break;
+                    }
+            }
         }
     }
     if (choice==1){
@@ -99,7 +101,7 @@ int menuMain(){
             printf("Ending game\n");
             gotoxy(x,n);
             printf("%*c",11,' ');
-            return 0; // exit flag så man ikke starter et spil
+            return 0; // exit-> return 0; så man ikke starter et spil
     }
 }
 
@@ -131,45 +133,46 @@ int menuLevel(){
 
     while (1) {
         char str[4]={""};
-        keyboardInput(str);
-        if (arrowInput(str)==0x20) {
-                px=px+2;
-                gotoxy(px-2,n-2);
-                printf("%c",' ');
-        }
-        if (px>x+9){
-                px=x+3;
-        }
+        if (keyboardInput(str)>0) {
+            if (arrowInput(str)==0x20) {
+                    px=px+2;
+                    gotoxy(px-2,n-2);
+                    printf("%c",' ');
+            }
+            if (px>x+9){
+                    px=x+3;
+            }
 
 
-        if (arrowInput(str)==0x10){
-                px=px-2;
-                gotoxy(px+2,n-2);
-                printf("%c",' ');
-        }
-        if (px<x+3){
-                px=x+9;
-        }
-        gotoxy(px,n-2);
-        printf("%c",219);
-        if (arrowInput(str)==0x30){
-                if (px==x+3){
-                        choice=1;
-                        break;
+            if (arrowInput(str)==0x10){
+                    px=px-2;
+                    gotoxy(px+2,n-2);
+                    printf("%c",' ');
+            }
+            if (px<x+3){
+                    px=x+9;
+            }
+            gotoxy(px,n-2);
+            printf("%c",219);
+            if (arrowInput(str)==0x30){
+                    if (px==x+3){
+                            choice=1;
+                            break;
 
-                }
-                if (px==x+5){
-                        choice=2;
-                       break;
-                }
-                if (px==x+7){
-                        choice=3;
-                        break;
-                }
-                if (px==x+9){
-                        choice=4;
-                        break;
-                }
+                    }
+                    if (px==x+5){
+                            choice=2;
+                           break;
+                    }
+                    if (px==x+7){
+                            choice=3;
+                            break;
+                    }
+                    if (px==x+9){
+                            choice=4;
+                            break;
+                    }
+            }
         }
     }
     if (choice==1){
@@ -271,7 +274,7 @@ int bossKey(char * str, //bossKey skal kende alt for at kunne tegne det igen
                     clrscr();
                     TIM2->CR1 |= 0x0001;
                     drawBox(gameBox);
-                    if(ship->alive==1){
+                    if(ship->alive>0){
                         drawShip(ship);
                     }
                     if (seagull0->alive==1){
@@ -321,13 +324,13 @@ int bossKey(char * str, //bossKey skal kende alt for at kunne tegne det igen
 void scoreCount(int kill,int16_t * scoreTemp) {
    static int killOld;
    if(killOld!=kill) {
-       *scoreTemp+=(200-((getS()+getM()*60)/2));
+       *scoreTemp+=50* ((1<<20/((getS()+getM()*60))));
        killOld=kill;
    }
 }
 
 void splashScreen() { // ændr puttys vindue til 175 "columns" og 70 "rows" i /change settings->window, checkmark "change the size of the font".
-    printf("                                                                                                                                                         .., ,,,,:::, .......\n");
+   /* printf("                                                                                                                                                         .., ,,,,:::, .......\n");
     printf("                                                                                                                                                      ..,,:: ,................\n");
     printf("                                                                                                                                               ..  ,,,,,,,,,,:,, .  .:,....\n");
     printf("                                                                                                                                           ..  ,,,,,,:::cccclllll:. .  ...\n");
@@ -389,8 +392,8 @@ void splashScreen() { // ændr puttys vindue til 175 "columns" og 70 "rows" i /ch
     printf("             ..... ,,,,,,,,  ...\n");
     printf("             ..............\n");
     printf("               ..\n");
-
-    int n=30;
+ */
+    int n=40;
     gotoxy(20,1);
     printf("%*c _______\n",n);
     printf("%*c|   _   .-----.---.-.----.-----. \n",n);
@@ -414,8 +417,10 @@ void splashScreen() { // ændr puttys vindue til 175 "columns" og 70 "rows" i /ch
     printf("%*c |::.. . | \n",n);
     printf("%*c `-------' \n",n);
 
-    gotoxy(60,75);
+    gotoxy(60,45);
+    printf("\e[5m");
     printf("Press 'Enter' to start!");
+    printf("\e[25m");
      while (1) {
         char str[4]={""};
         keyboardInput(str);

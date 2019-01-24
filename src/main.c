@@ -66,15 +66,27 @@ int main(void) {
     struct velocityvector powerUp2;
 
 
-
+    resetbgcolor();
+    // init LED og sluk den
+    initLED();
     int rgb[3]; // lysinfo til powerUps!
-    rgb[0]=1;
+    rgb[0]=0;
     rgb[1]=0;
     rgb[2]=0;
-
-    initLED();
     setLED(rgb);
+
+
+    // init LCD og gør den blank
     lcd_init();
+    int8_t buffer[512];
+    memset(buffer,0x00,512);
+    char lcdStrMenu[]={"- Space Sea Gulls                       Vs. Ships -"};
+    lcd_write_string(buffer,lcdStrMenu,1,1);
+    lcd_push_buffer(buffer);
+
+    //init buzzer
+    initBuzzer();
+    setFreq(0);
 
     printf("\e[?25l"); // gør cursor usynlig
 /*
@@ -86,7 +98,7 @@ int main(void) {
 
         drawPowerUp(&powerUp0);
  */
-    printf("BETA stage: Everything you see is subject to change.\n");
+    printf("BETA : Everything you see is subject to change.\n");
 
 
     // HER BEGYNDER IDAS MAINS SCRIPT!!
@@ -104,9 +116,19 @@ int main(void) {
     int won=0;
     int level=0;
     int kill;
+    int shipAliveOld;
+    int scoreOld;
 while (1) {
+
     if (won == 0 || level>=3){
+        char lcdStrMenu[]={"- Space Sea Gulls                       Vs. Ships -"};
+        lcd_write_string(buffer,lcdStrMenu,1,1);
+        lcd_push_buffer(buffer);
         level=menuMain();
+        rgb[0]=0;
+        rgb[1]=0;
+        rgb[2]=0;
+        setLED(rgb);
         score=0;
     }
     if (level==4){
@@ -128,7 +150,7 @@ while (1) {
             gotoxy(64,15);
             printf("You have succesfully turned the ship.\n");
             gotoxy(66,15);
-            printf("Now try to move the ship!\n");
+            printf("Now try to move your the ship!\n");
 
             while(moved<4){
                 char str1[4]={""};
@@ -140,7 +162,7 @@ while (1) {
             gotoxy(66,15);
             printf("You have succesfully moved the ship.\n");
             gotoxy(68,15);
-            printf("Now try to shoot the ship!\n");
+            printf("Now try and shoot!\n");
 
             while(shotFired<3){
                 char str2[4]={""};
@@ -148,7 +170,9 @@ while (1) {
                     shotFired++;
                 }
                 moveShot(&shot0,&gameBox,3);
-                drawShip(&ship);
+                if (detectCollsionShip(&shot0,&ship)==1){
+                    drawShip(&ship);
+                }
             }
             gotoxy(68,15);
             printf("You have completed the tutorial\n");
@@ -160,7 +184,7 @@ while (1) {
         continue;
         }
 
-        if (won==1){
+        if (won==1){ // won=1 når man har vundet et level, men ikke har gennemført
             level++;
             scoreWon=score;
             won=0;
@@ -177,6 +201,10 @@ while (1) {
                 &powerUp0,&powerUp1,&powerUp2);
         resetWatch();
         score=scoreWon;
+        rgb[0]=0;
+        rgb[1]=0;
+        rgb[2]=0;
+        setLED(rgb);
 
         kill=0;
         clrscr();
@@ -235,31 +263,6 @@ while (1) {
             if(keyboardInput(text)==0) {
                 ship.enabled=0;
             }
-            moveShip(&ship,&gameBox);
-
-            // Beregner og skriver score til Display
-            scoreCount(kill,&score);
-            char *lcdStrScore[24];
-            if (ship.alive==3){
-                sprintf(lcdStrScore,"SCORE: %04d               HEALTH: <3 <3 <3 ",score);
-            }
-            else if (ship.alive==2){
-                sprintf(lcdStrScore,"SCORE: %04d               HEALTH: <3 <3 ",score);
-            }
-            else if (ship.alive==1){
-                sprintf(lcdStrScore,"SCORE: %04d               HEALTH: <3",score);
-            }
-            else {
-                sprintf(lcdStrScore,"SCORE: %04d               HEALTH: ",score);
-            }
-            int8_t buffer[512];
-            memset(buffer,0x00,512);
-
-
-            lcd_write_string(buffer,lcdStrScore,20);
-            lcd_push_buffer(buffer);
-
-
 
 
 
@@ -293,8 +296,6 @@ while (1) {
                     Gravity(&shot2,&asteroidL);
                     Gravity(&shot2,&asteroidS);
                 }
-
-
             }
 
 
@@ -302,18 +303,18 @@ while (1) {
         // ------------------COLLISION DETECTION--------------------
 
             //man kan skyde måger og tælle sine kills!
-            if(    detectCollisionSeagull(&shot0,&seagull0)==1
-                || detectCollisionSeagull(&shot0,&seagull1)==1
-                || detectCollisionSeagull(&shot0,&seagull2)==1
-                || detectCollisionSeagull(&shot0,&seagull3)==1
-                || detectCollisionSeagull(&shot1,&seagull0)==1
-                || detectCollisionSeagull(&shot1,&seagull1)==1
-                || detectCollisionSeagull(&shot1,&seagull2)==1
-                || detectCollisionSeagull(&shot1,&seagull3)==1
-                || detectCollisionSeagull(&shot2,&seagull0)==1
-                || detectCollisionSeagull(&shot2,&seagull1)==1
-                || detectCollisionSeagull(&shot2,&seagull2)==1
-                || detectCollisionSeagull(&shot2,&seagull3)==1){
+            if(    detectCollisionSeagull(&seagull0,&shot0)==1
+                || detectCollisionSeagull(&seagull1,&shot0)==1
+                || detectCollisionSeagull(&seagull2,&shot0)==1
+                || detectCollisionSeagull(&seagull3,&shot0)==1
+                || detectCollisionSeagull(&seagull0,&shot1)==1
+                || detectCollisionSeagull(&seagull1,&shot1)==1
+                || detectCollisionSeagull(&seagull2,&shot1)==1
+                || detectCollisionSeagull(&seagull3,&shot1)==1
+                || detectCollisionSeagull(&seagull0,&shot2)==1
+                || detectCollisionSeagull(&seagull1,&shot2)==1
+                || detectCollisionSeagull(&seagull2,&shot2)==1
+                || detectCollisionSeagull(&seagull3,&shot2)==1){
                 kill++;
             }
 
@@ -340,36 +341,66 @@ while (1) {
 
 
             //måger kan æde en                    EVT. et tjek om måger levende
-            detectCollsionShip(&seagull0,&ship);
-            detectCollsionShip(&seagull1,&ship);
-            detectCollsionShip(&seagull2,&ship);
-            detectCollsionShip(&seagull3,&ship);
+            detectCollisionSeagull(&seagull0,&ship);
+            detectCollisionSeagull(&seagull1,&ship);
+            detectCollisionSeagull(&seagull2,&ship);
+            detectCollisionSeagull(&seagull3,&ship);
+
+    //  ----END Collision detetction---------------------------------
+
+            moveShip(&ship,&gameBox);
+
+             // Beregner og skriver score til Display
+            scoreCount(kill,&score);
+            if (ship.alive!=shipAliveOld || score!=scoreOld) { // så den kun pusher til LCD ved ændring af værdier
+                char *lcdStrScore[24];
+                if (ship.alive==3){
+                    sprintf(lcdStrScore,"SCORE: %05d              HEALTH: <3 <3 <3 ",score);
+                }
+                else if (ship.alive==2){
+                    sprintf(lcdStrScore,"SCORE: %05d              HEALTH: <3 <3 ",score);
+                }
+                else if (ship.alive==1){
+                    sprintf(lcdStrScore,"SCORE: %05d              HEALTH: <3",score);
+                }
+                else {
+                    sprintf(lcdStrScore,"SCORE: %05d              HEALTH: ",score);
+                }
+
+                memset(buffer,0x00,512);
+
+                lcd_write_string(buffer,lcdStrScore,24,1);
+                lcd_push_buffer(buffer);
+                shipAliveOld=ship.alive;
+                scoreOld=score;
+            }
 
 
 
-    //  ---------------------------------------------------
+
+
 
 
             // HER STARTER EGENTLIG SCRIPT AF LEVELS
 
             if(kill==0){
                 if (updateSeagull1(10)==1){
-                    moveSeagull(&seagull0,&gameBox,&asteroidL,&asteroidS);
+                    moveSeagull(&seagull0,&gameBox,&asteroidL,&asteroidS,&powerUp0);
                 }
             }
-            if (kill>0){
-                if (kill==1){
+            if (kill>0 ){
+                if (kill==1 ){
                         reviveSeagull(&seagull1,60,10,-1,1);
                         reviveSeagull(&seagull2,10,110,1,-1);
                 }
-                if (updateSeagull1(10)==1){
-                    moveSeagull(&seagull1,&gameBox,&asteroidL,&asteroidS);
-                    moveSeagull(&seagull2,&gameBox,&asteroidL,&asteroidS);
+                if (updateSeagull1(10)==1 && kill<5){
+                    moveSeagull(&seagull1,&gameBox,&asteroidL,&asteroidS,&powerUp0);
+                    moveSeagull(&seagull2,&gameBox,&asteroidL,&asteroidS,&powerUp0);
                 }
 
 
-                if (level>1){
-                    if (getS()==15 && powerUp0.alive==0) {
+                if (level>1 && kill<5 ){
+                    if (getS()==15 && powerUp0.enabled==0 && powerUp0.alive==0) {
                             powerUp0.alive=1;
                             drawPowerUp(&powerUp0);
                     }
@@ -379,8 +410,8 @@ while (1) {
                         reviveSeagull(&seagull3,60,110,-1,-1);
                     }
                     if(updateSeagull2(5)==1){
-                        moveSeagull(&seagull0,&gameBox,&asteroidL,&asteroidS);
-                        moveSeagull(&seagull3,&gameBox,&asteroidL,&asteroidS);
+                        moveSeagull(&seagull0,&gameBox,&asteroidL,&asteroidS,&powerUp0);
+                        moveSeagull(&seagull3,&gameBox,&asteroidL,&asteroidS,&powerUp0);
                     }
                 }
                 if (level==3){
@@ -392,16 +423,19 @@ while (1) {
                             reviveSeagull(&seagull3,60,40,1,1);
                         }
                         if(updateSeagull2(1)==1){
-                                moveSeagull(&seagull0,&gameBox,&asteroidL,&asteroidS);
-                                moveSeagull(&seagull3,&gameBox,&asteroidL,&asteroidS);
+                                moveSeagull(&seagull0,&gameBox,&asteroidL,&asteroidS,&powerUp0);
+                                moveSeagull(&seagull3,&gameBox,&asteroidL,&asteroidS,&powerUp0);
                         }
                         if(updateSeagull1(2)==1){
-                                moveSeagull(&seagull1,&gameBox,&asteroidL,&asteroidS);
-                                moveSeagull(&seagull2,&gameBox,&asteroidL,&asteroidS);
+                                moveSeagull(&seagull1,&gameBox,&asteroidL,&asteroidS,&powerUp0);
+                                moveSeagull(&seagull2,&gameBox,&asteroidL,&asteroidS,&powerUp0);
                         }
                     }
                 }
             }
+
+
+
             if (level==1){
                 if (kill==3){
                     clrscr();
@@ -435,11 +469,49 @@ while (1) {
                     printf("Total Score %d",score);
                     for(int q=0; q<=1<<23;q++){
                     }
+
+                    setFreq(659);
+                    for(int q=0; q<=1<<20;q++){
+                    }
+                    setFreq(698);
+                    for(int q=0; q<=1<<19;q++){
+                    }
+                    setFreq(783);
+                    for(int q=0; q<=1<<20;q++){
+                    }
+                    setFreq(659);
+                    for(int q=0; q<=1<<20;q++){
+                    }
+                    setFreq(698);
+                    for(int q=0; q<=1<<19;q++){
+                    }
+                    setFreq(783);
+                    for(int q=0; q<=1<<20;q++){
+                    }
+                    setFreq(659);
+                    for(int q=0; q<=1<<20;q++){
+                    }
+                    setFreq(698);
+                    for(int q=0; q<=1<<19;q++){
+                    }
+                    setFreq(659*3/2);
+                    for(int q=0; q<=1<<21;q++){
+                    }
+                    setFreq(0);
+
                     gotoxy(44,45);
                     printf("Press 'Space' or 'Enter' to continue",score);
                     uart_clear();
-                    while(keyboardInput(text)==0){}
 
+                    char lcdStrEnd[]={"GZ GGEZ WP RoflCopter "};
+                    lcd_write_string(buffer,lcdStrEnd,0,0);
+                    while(keyboardInput(text)==0){
+                        lcd_update(buffer,lcdStrEnd);
+                        lcd_push_buffer(buffer);
+                    }
+                    memset(buffer,0x00,512);
+                    lcd_push_buffer(buffer);
+                    scoreWon=0;
                     won=0;
                     break;
                 }
@@ -447,15 +519,35 @@ while (1) {
             if (ship.alive==0){
                 clrscr();
                 gotoxy(40,45);
-                printf("U DEAD HA HA HA!");
+                printf("Sorry you died. Have a go again!");
                 gotoxy(42,45);
                 printf("Total Score: %d",score);
                     for(int q=0; q<=1<<23;q++){
                     }
+
+                    setFreq(262);
+                    for(int q=0; q<=1<<21;q++){
+                    }
+                    setFreq(220);
+                    for(int q=0; q<=1<<21;q++){
+                    }
+                    setFreq(165);
+                    for(int q=0; q<=1<<21;q++){
+                    }
+                    setFreq(0);
+
                     gotoxy(44,45);
                     printf("Press 'Space' or 'Enter' to continue",score);
                     uart_clear();
-                    while(keyboardInput(text)==0){}
+                    char lcdStrEnd[]={"U DEAD HA HA HA!"};
+                    lcd_write_string(buffer,lcdStrEnd,0,0);
+                    while(keyboardInput(text)==0){
+                        lcd_update(buffer,lcdStrEnd);
+                        lcd_push_buffer(buffer);
+                    }
+                    memset(buffer,0x00,512);
+                    lcd_push_buffer(buffer);
+                    scoreWon=0;
                 kill=0;
                 break;
             }

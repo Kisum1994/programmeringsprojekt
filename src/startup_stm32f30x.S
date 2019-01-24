@@ -129,7 +129,7 @@ __isr_vector:
 	.long	0
 	.long	0
 	.long	0
-	.long	0
+    .long	0
 	.long	0
 	.long	USB_HP_IRQHandler
 	.long	USB_LP_IRQHandler

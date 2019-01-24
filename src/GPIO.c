@@ -474,26 +474,34 @@ int8_t keyboardInput(char * text) {  // SKAL MÅSKE IKKE LIGGE I GPIO.c
 
 
 
-void lcd_write_string(uint8_t * buffer, char * str,int location){
+void lcd_write_string(uint8_t * buffer, char * str,int locationLine,int numberLine){
     int i=0;
     int j=0;
 
     while (str[i]!=0x00) {
             for (j=0;j<5;j++) {
-                buffer[(i*5+j)+location] = character_data[str[i]-0x20][j];
+               int L =(i*5+j)+locationLine+128*numberLine;
+               if (L>512){
+                    L-=512;
+               }
+                buffer[(i*5+j)+locationLine+128*numberLine] = character_data[str[i]-0x20][j];
             }
             i++;
     }
 }
 
 void lcd_update(uint8_t * buffer, char * str){
-
     static int i=0;
     static int j=0;
     if (i==50) {
-        lcd_write_string(buffer,str,j);
+        memset(buffer,0x00,512);
+        lcd_push_buffer(buffer);
+        lcd_write_string(buffer,str,j,0);
         i-=50;
         j++;
+        if (j==512){
+                j=0;
+        }
     }
     i++;
 }
