@@ -91,7 +91,7 @@ int menuMain(){
     if (choice==3){
             printf("introduction\n");
             // køre en tutorial??
-            return 1;
+            return 4;
     }
     if (choice==4){
             clrscr();
@@ -171,43 +171,92 @@ int menuLevel(){
                         break;
                 }
         }
-}
-        if (choice==1){
-                clrscr();
-                gotoxy(x,n);
-                printf("Level 1 initialising\n");
-
-                gotoxy(x,n);
-                printf("%*c",19, ' ');
-                return 1;
+    }
+    if (choice==1){
+            clrscr();
+            gotoxy(x,n);
+            printf("Level 1 initialising\n");
+            //wait -> tæl til 4 000 000 i et for loop
+            return 1;
         }
         if (choice==2){
-                clrscr();
-                gotoxy(x,n);
-                printf("Level 2 initialising\n");
-                gotoxy(x,n);
-                printf("%*c",19, ' ');
-                return 2;
+            clrscr();
+            gotoxy(x,n);
+            printf("Level 2 initialising\n");
+            //wait
+            return 2;
         }
         if (choice==3){
-                clrscr();
-                gotoxy(x,n);
-                printf("Level 3 initialising\n");
-                gotoxy(x,n);
-                printf("%*c",19, ' ');
-                return 3;
+            clrscr();
+            gotoxy(x,n);
+            printf("Level 3 initialising\n");
+            //wait
+            return 3;
         }
         else if (choice==4){
-                clrscr();
-                menuMain();
+            clrscr();
+            menuMain();
         }
-    }
+}
 
+void tutorial(){
+    clrscr();
+    int n=15;
+    int x=0;
+    gotoxy(x,n);
+    printf("  _   _                 _                _             ");
+    gotoxy(x+1,n);
+    printf(" | | | | _____      __ | |_ ___    _ __ | | __ _ _   _ ");
+    gotoxy(x+2,n);
+    printf(" | |_| |/ _ \\ \\ /\\ / / | __/ _ \\  | '_ \\| |/ _` | | | |");
+    gotoxy(x+3,n);
+    printf(" |  _  | (_) \\ V  V /  | || (_) | | |_) | | (_| | |_| |");
+    gotoxy(x+5,n);
+    printf(" |_| |_|\\___/ \\_/\\_/    \\__\\___/  | .__/|_|\\__,_|\\__, |");
+    gotoxy(x+6,n);
+    printf("                                  |_|            |___/ ");
 
+    gotoxy(x+10,n);
+    printf("The goal of the game is to shoot the space seagulls, as the one seen below:");
+    // måge position står
+    gotoxy(x+15,n+25);
+    printf("%c%c%c%c%c%c%c%c%c",' ',' ',47,92,' ',47,92,' ',' ');
+    gotoxy(x+16,n+25);
+    printf("%c%c%c%c%c%c%c%c%c",' ',35,' ',' ',153,' ',' ',35,' ');
+    gotoxy(x+17,n+25);
+    printf("%c%c%c%c%c%c%c%c%c",' ', 118,' ',' ',35,' ',' ',118,' ');
 
-int bossKey(char * str, struct velocityvector * ship,struct velocityvector * shot,struct box * gameBox, struct velocityvector * seagull0,struct velocityvector * seagull1,struct velocityvector * seagull2,struct velocityvector * seagull3,struct velocityvector * asteroidS, struct velocityvector * asteroidL){
+    gotoxy(x+20,n);
+    printf("_______________________________________________________________");
+    gotoxy(x+23,n);
+    printf("To control the ship you use the arrows and space on the keyboard");
 
+    gotoxy(x+25,n);
+    printf("If the right arrow is pressed the ship rotates clockwise");
+    gotoxy(x+27,n);
+    printf("If the left arrow is pressed the ship rotates counter clockwise");
+    gotoxy(x+29,n);
+    printf("If the up arrow is pressed the ship moves forward");
+    gotoxy(x+31,n);
+    printf("If space is pressed the ship shoots");
+}
 
+int bossKey(char * str, //bossKey skal kende alt for at kunne tegne det igen
+            struct velocityvector * ship,
+            struct velocityvector * shot0,
+            struct velocityvector * shot1,
+            struct velocityvector * shot2,
+            struct box * gameBox,
+            struct velocityvector * seagull0,
+            struct velocityvector * seagull1,
+            struct velocityvector * seagull2,
+            struct velocityvector * seagull3,
+            struct velocityvector * asteroidS,
+            struct velocityvector * asteroidL,
+            struct velocityvector * powerUp0,
+            struct velocityvector * powerUp1,
+            struct velocityvector * powerUp2)
+{
         if (arrowInput(str)==0x30){
 
         TIM2->CR1 &= ~0x0001;
@@ -243,15 +292,38 @@ int bossKey(char * str, struct velocityvector * ship,struct velocityvector * sho
                     if (asteroidL->alive==1){
                         drawAsteroid(asteroidL);
                     }
-                    if(shot->alive==1){
-                        moveShot(shot);
+                    if(shot0->alive==1){
+                        moveShot(shot0);
+                    }
+                    if(shot1->alive==1){
+                        moveShot(shot1);
+                    }
+                    if(shot2->alive==1){
+                        moveShot(shot2);
+                    }
+                    if (powerUp0->alive==1) {
+                        drawPowerUp(powerUp0);
+                    }
+                    if (powerUp1->alive==1) {
+                        drawPowerUp(powerUp2);
+                    }
+                    if (powerUp2->alive==1){
+                        drawPowerUp(powerUp2);
                     }
                     break;
                 }
             }
         }
-        }
+    }
+}
 
+
+void scoreCount(int kill,int16_t * scoreTemp) {
+   static int killOld;
+   if(killOld!=kill) {
+       *scoreTemp+=(200-((getS()+getM()*60)/2));
+       killOld=kill;
+   }
 }
 
 void splashScreen() { // ændr puttys vindue til 175 "columns" og 70 "rows" i /change settings->window, checkmark "change the size of the font".
@@ -333,7 +405,7 @@ void splashScreen() { // ændr puttys vindue til 175 "columns" og 70 "rows" i /ch
     printf("%*c|.  |   |_____|__|__|_____| \n",n);
     printf("%*c|:  1   |         .--.--.-----. \n",n);
     printf("%*c|::.. . |         |  |  |__ --|_  \n",n);
-    printf("%*c`-------'          \___/|_____|__| \n",n);
+    printf("%*c`-------'          \\___/|_____|__| \n",n);
     printf("%*c  _______ __    __              \n",n);
     printf("%*c |   _   |  |--|__.-----.-----. \n",n);
     printf("%*c |   1___|     |  |  _  |__ --| \n",n);

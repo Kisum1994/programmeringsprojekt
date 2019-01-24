@@ -15,10 +15,10 @@
     int s_;
     int m;
     int h;
-    int tmp;
-    int tmp1;
-    int tmp2;
-    int tmp3;
+    int tmpship1;
+    int tmpship2;
+    int tmpseagull1;
+    int tmpseagull2;
     int tmpshot0;
     int tmpshot1;
     int tmpshot2;
@@ -31,9 +31,7 @@ int getS() {return s;}
 int getS_() {return s_;}
 int getM() {return m;}
 int getH() {return h;}
-int getTMP() {return tmp;}
-int getTMP2() {return tmp2;}
-int getTMP3() {return tmp3;}
+
 
 void initJoystick () {
  RCC->AHBENR |= RCC_AHBPeriph_GPIOA;
@@ -283,10 +281,10 @@ void TIM1_BRK_TIM15_IRQHandler(void){
             }
     }
     time++;
-    tmp++;
-    tmp1++;
-    tmp2++;
-    tmp3++;
+    tmpship1++;
+    tmpship2++;
+    tmpseagull1++;
+    tmpseagull2++;
     tmpshot0++;
     tmpshot1++;
     tmpshot2++;
@@ -366,6 +364,12 @@ int8_t get_char(char * text, int length) {
     return 0;
 }
 
+void resetWatch(void){
+    time=0;
+    s=0;
+    m=0;
+    h=0;
+}
 
 
 void PCtimer (int * input) { // stopur der kan kontrolleres med get_char og userInput funktionerne. Brug userInput(readKeyboard()) som input.
@@ -432,37 +436,67 @@ int userInput(char * str) { // til keyboard styring af PCtimer();
 
 int8_t keyboardInput(char * text) {  // SKAL MÅSKE IKKE LIGGE I GPIO.c
     // fungerer som get_char(); men har en grænse på 3 karakterer for piletasterne
-    static int buffCount=0; //Husk at forklare static variable i rapport
+    static uint8_t buffCount=0; //Husk at forklare static variable i rapport
     if (buffCount<3) {
         if (0<uart_get_count()) {
             text[buffCount]=uart_get_char();
             buffCount++;
         }
-        if (text[buffCount-1]==0x0d) {
-            text[buffCount]=0x00;
-            buffCount = 0;
-            return 1;
-            uart_clear();
-        }
-        else if (text[buffCount-1]==0x20) {
-            text[buffCount]=0x00;
-            buffCount = 0;
-            return 1;
-            uart_clear();
+        if (buffCount!=0) {
+            if (text[buffCount-1]==0x0d) {
+                text[buffCount]=0x00;
+                buffCount = 0;
+                uart_clear();
+                return 1;
+
+            }
+            else if (text[buffCount-1]==0x20) {
+                text[buffCount]=0x00;
+                buffCount = 0;
+                uart_clear();
+                return 1;
+            }
         }
     }
     if(buffCount==3){
-
         buffCount = 0;
-        return 1;
         uart_clear();
+        return 1;
+
     }
     else {
+        strcpy(text,"");
         return 0;
     }
 }
 
 
+
+
+
+void lcd_write_string(uint8_t * buffer, char * str,int location){
+    int i=0;
+    int j=0;
+
+    while (str[i]!=0x00) {
+            for (j=0;j<5;j++) {
+                buffer[(i*5+j)+location] = character_data[str[i]-0x20][j];
+            }
+            i++;
+    }
+}
+
+void lcd_update(uint8_t * buffer, char * str){
+
+    static int i=0;
+    static int j=0;
+    if (i==50) {
+        lcd_write_string(buffer,str,j);
+        i-=50;
+        j++;
+    }
+    i++;
+}
 
 
 int arrowInput(char * str) {  // keypoardInput bliver oversat til HEX-tal
@@ -498,8 +532,8 @@ int arrowInput(char * str) {  // keypoardInput bliver oversat til HEX-tal
 
 
 int updateSeagull1(int speed) {
-    if ( tmp1 >= speed ){
-        tmp1 = 0;
+    if ( tmpseagull1 >= speed ){
+        tmpseagull1 = 0;
         return 1;
     }
     else{
@@ -508,8 +542,8 @@ int updateSeagull1(int speed) {
 }
 
 int updateSeagull2(int speed) {
-    if ( tmp2 >= speed ){
-        tmp2 = 0;
+    if ( tmpseagull2 >= speed ){
+        tmpseagull2 = 0;
         return 1;
     }
     else{
@@ -538,8 +572,8 @@ int updateShot1(int speed) {
 }
 
 int updateShot2(int speed) {
-    if ( tmpshot1 >= speed ){
-        tmpshot1 = 0;
+    if ( tmpshot2 >= speed ){
+        tmpshot2 = 0;
         return 1;
     }
     else{
@@ -548,9 +582,19 @@ int updateShot2(int speed) {
 }
 
 
-int updateShip(int speed) {
-    if ( tmp3 >= speed ){
-        tmp3 = 0;
+int updateShip1(int speed) {
+    if ( tmpship1 >= speed ){
+        tmpship1 = 0;
+        return 1;
+    }
+    else{
+        return 0;
+    }
+}
+
+int updateShip2(int speed) {
+    if ( tmpship2 >= speed ){
+        tmpship2 = 0;
         return 1;
     }
     else{
