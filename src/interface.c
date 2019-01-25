@@ -8,7 +8,10 @@
 #include "interface.h"
 /* This file contains all interface functions for the game */
 
-int menuMain(){
+//Ida
+//Hovedmenuen for spillet
+int menuMain(void){
+    //printer menuen
     clrscr();
     int n=15;
     int x=5;
@@ -25,17 +28,18 @@ int menuMain(){
     printf("Get an introduction to the game.");
     gotoxy(x+9,n);
     printf("Exit game");
-    /*printf(" Please choose an option from the main menu: ");*/
 
-    //place marker
+    //laver en place marker
     int px=x+3;
     int choice;
     gotoxy(px,n-2);
     printf("%c",219);
 
+    // Kører et hvile loop så længe brugeren ikke har trykket på enter
     while (1) {
         char str[4]={""};
         if (keyboardInput(str)>0) {
+            //hvis input er pil ned skal cursoren gå til næste menu option.
             if (arrowInput(str)==0x20) {
                     px=px+2;
                     gotoxy(px-2,n-2);
@@ -45,7 +49,7 @@ int menuMain(){
                     px=x+3;
             }
 
-
+            //hvis input er pil op skal cursoren gå til overstående menu option.
             if (arrowInput(str)==0x10){
                     px=px-2;
                     gotoxy(px+2,n-2);
@@ -54,9 +58,11 @@ int menuMain(){
             if (px<x+2){  //wrap around fra bunden
                     px=x+9;
             }
+            //printer cursoren i den korrekte position
             gotoxy(px,n-2);
             printf("%c",219);
 
+            //hvis brugeren trykker enter gemmes menuvalget i form af choice og while looped breakes
             if (arrowInput(str)==0x30){
                     if (px==x+3){
                             choice=1;
@@ -77,6 +83,7 @@ int menuMain(){
             }
         }
     }
+    // Sætter korrekte ting i gang ud fra værdi af choice
     if (choice==1){
             clrscr();
             gotoxy(x,n);
@@ -84,15 +91,17 @@ int menuMain(){
             gotoxy(x,n);
             printf("%*c",13,' ');
             // går videre fra menuMain functionen
+            //returnerer værdien 1, som derved initialiserer level 1 i main
             return 1;
     }
     if (choice==2){
-            return (menuLevel()); //går til choose level menu
+            //går til menuen menuLevel og returnerer værdien af det level, der vælges der
+            return (menuLevel());
 
     }
     if (choice==3){
             printf("introduction\n");
-            // køre en tutorial??
+            // kører en tutorial når værdien 4 returneres i main
             return 4;
     }
     if (choice==4){
@@ -103,10 +112,12 @@ int menuMain(){
             printf("%*c",11,' ');
             return 0; // exit-> return 0; så man ikke starter et spil
     }
+    else return 0;
 }
 
-
-int menuLevel(){
+//Ida
+// Level menu, hvor man kan starte spilet fra enten level 1,2 eller 3. Eller man kan vælge at gå tilbage til hovedmenuen.
+int menuLevel(void){
     clrscr();
     int n=15;
     int x=5;
@@ -126,14 +137,15 @@ int menuLevel(){
 
     //place marker
     int choice=0;
-    int level=0;
     int px=x+3;
     gotoxy(px,n-2);
     printf("%c",219);
 
+    // Kører et hvile loop så længe brugeren ikke har trykket på enter
     while (1) {
         char str[4]={""};
         if (keyboardInput(str)>0) {
+            //hvis input er pil ned skal cursoren gå til næste menu option.
             if (arrowInput(str)==0x20) {
                     px=px+2;
                     gotoxy(px-2,n-2);
@@ -143,7 +155,7 @@ int menuLevel(){
                     px=x+3;
             }
 
-
+            //hvis input er pil op skal cursoren gå til næste menu option.
             if (arrowInput(str)==0x10){
                     px=px-2;
                     gotoxy(px+2,n-2);
@@ -154,6 +166,7 @@ int menuLevel(){
             }
             gotoxy(px,n-2);
             printf("%c",219);
+            //hvis brugeren trykker enter gemmes menuvalget i form af choice og while looped breakes
             if (arrowInput(str)==0x30){
                     if (px==x+3){
                             choice=1;
@@ -174,35 +187,44 @@ int menuLevel(){
                     }
             }
         }
+
     }
     if (choice==1){
             clrscr();
             gotoxy(x,n);
             printf("Level 1 initialising\n");
             //wait -> tæl til 4 000 000 i et for loop
+            //returnerer 1 til menuMain, hvorefter værdien gemmes som level i main
             return 1;
-        }
-        if (choice==2){
+    }
+    if (choice==2){
             clrscr();
             gotoxy(x,n);
             printf("Level 2 initialising\n");
             //wait
+            //returnerer 2 til menuMain, hvorefter værdien gemmes som level i main
             return 2;
-        }
-        if (choice==3){
+    }
+    if (choice==3){
             clrscr();
             gotoxy(x,n);
             printf("Level 3 initialising\n");
             //wait
+            //returnerer 3 til menuMain, hvorefter værdien gemmes som level i main
             return 3;
-        }
-        else if (choice==4){
+    }
+    else if (choice==4){
             clrscr();
+            //viser hoved menuen igen.
             menuMain();
-        }
+            return 0;
+    }
+    else return 0;
 }
 
-void tutorial(){
+//Ida
+// Viser tutorial tekst.
+void tutorial(void){
     clrscr();
     int n=15;
     int x=0;
@@ -244,8 +266,9 @@ void tutorial(){
     printf("If space is pressed the ship shoots");
 }
 
-int bossKey(char * str, //bossKey skal kende alt for at kunne tegne det igen
-            struct velocityvector * ship,
+//Jesper
+//Aktiverer bossKey. Funktionen skal kende alle ting i spillet for at kunne tegne det igen
+void bossKey(char * str,struct velocityvector * ship,
             struct velocityvector * shot0,
             struct velocityvector * shot1,
             struct velocityvector * shot2,
@@ -258,22 +281,27 @@ int bossKey(char * str, //bossKey skal kende alt for at kunne tegne det igen
             struct velocityvector * asteroidL,
             struct velocityvector * powerUp0,
             struct velocityvector * powerUp1,
-            struct velocityvector * powerUp2)
-{
+            struct velocityvector * powerUp2){
+        // Når der trykkes på enter cleares skærmen og der printes et falsk arbejdsdokument på skærmen.
         if (arrowInput(str)==0x30){
-
+        // Stopper tiden
         TIM2->CR1 &= ~0x0001;
         clrscr();
-        gotoxy(0,0);
-        printf("\nC:/Dokumenter/HardAtWork.doc\n\n");
+        gotoxy(4,4);
+        printf("\nC:/Dokumenter/HardAtWork.doc");
+        gotoxy(6,4);
         printf("Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n\nInteger nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi.\nNulla quis sem at nibh elementum imperdiet.\n\nDuis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta.\nMauris massa. Vestibulum lacinia arcu eget nulla\nClass aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.\nCurabitur sodales ligula in libero.\n\nSed dignissim lacinia nunc.\n ");
         strcpy(str,"");
+        // while loop der fortsætter indtil der trykkes enter igen
+        //Alle inputs som var levende før bossKey blev trykket aktiveres
         while(1){
             if(keyboardInput(str)>0) {
                 if(arrowInput(str)==0x30){
                     clrscr();
+                    //Starter tiden igen
                     TIM2->CR1 |= 0x0001;
                     drawBox(gameBox);
+                    //tjekker hvad der er levende og tegner det igen.
                     if(ship->alive>0){
                         drawShip(ship);
                     }
@@ -296,13 +324,13 @@ int bossKey(char * str, //bossKey skal kende alt for at kunne tegne det igen
                         drawAsteroid(asteroidL);
                     }
                     if(shot0->alive==1){
-                        moveShot(shot0);
+                        moveShot(shot0,gameBox,asteroidL,asteroidS);
                     }
                     if(shot1->alive==1){
-                        moveShot(shot1);
+                        moveShot(shot1,gameBox,asteroidL,asteroidS);
                     }
                     if(shot2->alive==1){
-                        moveShot(shot2);
+                        moveShot(shot2,gameBox,asteroidL,asteroidS);
                     }
                     if (powerUp0->alive==1) {
                         drawPowerUp(powerUp0);
@@ -320,107 +348,54 @@ int bossKey(char * str, //bossKey skal kende alt for at kunne tegne det igen
     }
 }
 
-
+//Jakob og Jesper
+// Beregner scoren i løbet af spillet.
 void scoreCount(int kill,int16_t * scoreTemp) {
+   //En static int til at gemme den gamle værdi af kill.
    static int killOld;
+   //Der lægges score til hvis der foretages et kill
    if(killOld!=kill) {
-       *scoreTemp+=50* ((1<<20/((getS()+getM()*60))));
-       killOld=kill;
+        // Scoren afhænger af hurtighed.
+        if((getS()+getM()*60)<200) {
+            *scoreTemp+=(200-(getS()+getM()*60));
+        }
+        killOld=kill;
    }
 }
 
-void splashScreen() { // ændr puttys vindue til 175 "columns" og 70 "rows" i /change settings->window, checkmark "change the size of the font".
-   /* printf("                                                                                                                                                         .., ,,,,:::, .......\n");
-    printf("                                                                                                                                                      ..,,:: ,................\n");
-    printf("                                                                                                                                               ..  ,,,,,,,,,,:,, .  .:,....\n");
-    printf("                                                                                                                                           ..  ,,,,,,:::cccclllll:. .  ...\n");
-    printf("                                                                                                                                    ..  ,,,,::::::::::::cccllc  . ...    \n");
-    printf("                                                                                                                                    ...  ,,,::::::::,,,,,,,::cccl:......\n");
-    printf("                                                                                                                                 ..  ,,,::::::,,,     ,,::,,:ccc:.....\n");
-    printf("                                                                                                                              ..  ,,,:::,,  ........... ,:,::cc: ....\n");
-    printf("                                                                                                                              .,,,::,, .......   .......,:::cc:.....\n");
-    printf("                                                                                                                              . ,  .....           .... ,::cc,....\n");
-    printf("                                                                                     .......................                   ....                ... ,::c: ....\n");
-    printf("                                                                                ...............    ...............                                ... ,:c:,....\n");
-    printf("                                                                           ............     ,,,,,,,,      ............                           ... ::c: ...\n");
-    printf("                                                                        ........     ,,,,,:::::::::,         ............                       .. ,:c:,....\n");
-    printf("                                                                      ......  ,,,,,,:::::::cccc:::,,,,,,,,           ......                    .. :::: ...\n");
-    printf("                                                                   .....  ,,::::::::::::cclllc::::::,,:,,,,,,,,  ,,,  .......                .. ,::: ...\n");
-    printf("                                                                .....  ,:::::::::::cccclooolc::::::::::,,,,,,,,,:,,,      .....             ..,:::, ..\n");
-    printf("                                                              ....  ,:::::::::ccccclloddolc::::::::::::::::::::::,,,,,,,,  ......         ..,:::, ..\n");
-    printf("                                                            .... ,:::::::::ccccclloddddoc:::::::::::::::::::::::,,,,,,,,,,  ......      ..,:::, ..\n");
-    printf("                                                          .... ,::::::ccccclllloddxxdolc::c::::::::::::::::::::,,,,::::,,,   .....    .. :::, ..\n");
-    printf("                                                        ...  ,::::::cccllllloodxxxdolcccccccc::::::::::::::::,,,::::::,,,,,   ...   ..,:::, ..\n");
-    printf("                                                      ... ,,:::::cccllllloodxxxxdolccccccccccc::ccc::cc:::::::::::::::,,,,,, ..   ..,:::, ..\n");
-    printf("                                                     ..  ,::::cccllllloodxxkxxdllccccclccccccccccccccc:::::::::cc::::::,,,,...  ..,:::: ..\n");
-    printf("                                                    .. ,::::ccllllloodxxkkxdolllllllllcccccccccccccc::::::::cccc:::::::,, .. ...,:ccc:,.\n");
-    printf("                                                   ..,:::ccllllloodxxkkkxdollllllllllccccccccccccc:::::::ccllcc:::::::, .. .. ::cllc:,.\n");
-    printf("                                                  . :::clllllooddxxxkxdolllllllllllllccccllllcc::::::::ccllccc::::::: .. .. :cclcc::, .\n");
-    printf("                                                 . ::cclllooddxxxxddooollllllllllllllllclllcc::::::::cllllcccccc::: .....,:cllc::::::,.\n");
-    printf("                                                 .,:ccllodddxxdddoodoooolllllllllllllllllc::::::::clllllccccccc:: .....,:cllc:::cclc:,..\n");
-    printf("                                               . :cllooddddoollooodoooollllllllllllllcc::::::cclllolllcccccc:: .... ::lllc:::coooll:,..\n");
-    printf("                                                .:cllooooollllllooooolllllllooolllllc:::::::cllooollllllccc:,..... ::lllc:::lodddooc:,.\n");
-    printf("                                                .:ccllllllllllllloollllllllooooolcc::::::cllooollllllllcc: .....,:clllc::cloddxddollc:.\n");
-    printf("                                                 :cccllllllllllllllllooooooooolc:::::cclloooollllllllc:: .... ,:cllc:::clddxxxdddoolc,.\n");
-    printf("                                                 :ccllllllllllllllooooooooolc::::::cllooooolllllllcc:,..... ::lllc:::codxxxxxdddddol: .\n");
-    printf("                                                 :ccccllcccllllloooooooolcc::::ccllooooollooolllc:,..... ,:cllc::::lodxxkkxxxxxxxdoc:.\n");
-    printf("                                                .::ccccccclllllloooollc:::::ccllooooooolooollc: ......,:ccllc:::cldxxkkkkxxxxxxxdol: .\n");
-    printf("                                                .::cccclllllllooollc::::ccclloooooolooooolc:,...... ,:cllc::::lodxkkkkkkxxkkkkxdolc,.\n");
-    printf("                                                .:ccclllllooollcc::::ccclloooooolloooollc:...... ,:cllc::::codxkkkOOkkkkkkkkkxdolc:.\n");
-    printf("                                              .. :cllllooollcc:::cccllooooooolllooollc: ..... ::ccllc:::cloxkkkOOOkkkkkkOkkkxdooc:.\n");
-    printf("                                            ... ,:cllllllcc::ccclloooooooolloollllc: .. .. ,:clllc:::clodxkOOOOOOkkOOOOkkkxxddoc,.\n");
-    printf("                                          ... ,:, ,:cccccccclloooddooollllllollc: .. ...,:clllc::::lodxkOOOOOOOkkOOOOOkkxxxdol: .\n");
-    printf("                                        ... ,:, .. .:lllloooodoooollllllllllc: .. ... ::lllc:::clodxkOO00OOOOOOOOOOOkkxxxxdoc,.\n");
-    printf("                                      ... ,:, ..    .:loooooolllllllllllc:, .. ... ::cllc:::codxkkOO0000OOOOOOOOOOkkxxxxdoc:..\n");
-    printf("                                    ... ::: ..       .,cllccccccccccc::,... ... ::cllcccccodxkOOO00000OOOO0000OOOkkkkxxoc:..\n");
-    printf("                                  ... ,::,...          .:::ccccc:::, ..  ... ::cllcc:clodxkOOO00000OOO000000OOkkkkkkxoc:..\n");
-    printf("                                ... ,::, ..             . ::::, ...   ... ,:cllcccccodxkOO00000OOO00000000Okkkkkkxdo:,..\n");
-    printf("                              ....,::, ..                 ....     ... ::cclcccclodxkOO0000OOOOOO000000OOkkkkkxxoc: ..\n");
-    printf("                             ...,::, ...                        ... ::cclccccldxkkOOO000OOOOOO00000OOOOOkkkkxdl:,..\n");
-    printf("                           ... :::, ...                      ... ,:cclccclodxkkOOOOOOOOOOOOOOOOOOOOkkkkkkxdl:,..\n");
-    printf("                         ....,:::, ...                   ... ,::,,::::cldxkkOOOOkOOkOOOOOOOOOOkkkkkkkxxol: ..\n");
-    printf("                       .... ::,,, ...                ...  ,::,,, ... . :codxxxkkkkkkkkOOOkkkkkxxxxdol:,..\n");
-    printf("                      ....,::,,, ....           ..... ,:::,,, ...        .. ,::clloooooooollcc:,, ..\n");
-    printf("                    .....,:::,, ................. ,,:::,,  ...                    .........\n");
-    printf("                   .....::::,,, ...........  ,,::::,,,  ..\n");
-    printf("                  .....:::::,,:,,       ,,:::::,,,,  ..\n");
-    printf("                 .....:c::::,,,,,,, ,,:::::,,,,  ...\n");
-    printf("                ....  :cc::::::,,,,:::::,,,   ..\n");
-    printf("               .. .. .:ccc:::::::,,,,,    ...\n");
-    printf("              ..., .  .  ,,,          ...\n");
-    printf("             ....,:, .....    ,  ...\n");
-    printf("             ..... ,,,,,,,,  ...\n");
-    printf("             ..............\n");
-    printf("               ..\n");
- */
+//Jakob
+//Tegner en startskærm
+void splashScreen(void) { // Husk at ændre puttys vindue til 175 "columns" og 70 "rows" i /change settings->window, checkmark "change the size of the font".
+
     int n=40;
     gotoxy(20,1);
-    printf("%*c _______\n",n);
-    printf("%*c|   _   .-----.---.-.----.-----. \n",n);
-    printf("%*c|   1___|  _  |  _  |  __|  -__| \n",n);
-    printf("%*c|____   |   __|___._|____|_____| \n",n);
-    printf("%*c|:  1   |__|  \n",n);
-    printf("%*c|::.. . |  \n",n);
-    printf("%*c`-------' \n",n);
-    printf("%*c _______       __ __\n",n);
-    printf("%*c|   _   .--.--|  |  .-----. \n",n);
-    printf("%*c|.  |___|  |  |  |  |__ --| \n",n);
-    printf("%*c|.  |   |_____|__|__|_____| \n",n);
-    printf("%*c|:  1   |         .--.--.-----. \n",n);
-    printf("%*c|::.. . |         |  |  |__ --|_  \n",n);
-    printf("%*c`-------'          \\___/|_____|__| \n",n);
-    printf("%*c  _______ __    __              \n",n);
-    printf("%*c |   _   |  |--|__.-----.-----. \n",n);
-    printf("%*c |   1___|     |  |  _  |__ --| \n",n);
-    printf("%*c |____   |__|__|__|   __|_____| \n",n);
-    printf("%*c |:  1   |        |__|          \n",n);
-    printf("%*c |::.. . | \n",n);
-    printf("%*c `-------' \n",n);
+    printf("%*c _______\n",n,' ');
+    printf("%*c|   _   .-----.---.-.----.-----. \n",n,' ');
+    printf("%*c|   1___|  _  |  _  |  __|  -__| \n",n,' ');
+    printf("%*c|____   |   __|___._|____|_____| \n",n,' ');
+    printf("%*c|:  1   |__|  \n",n,' ');
+    printf("%*c|::.. . |  \n",n,' ');
+    printf("%*c`-------' \n",n,' ');
+    printf("%*c _______       __ __\n",n,' ');
+    printf("%*c|   _   .--.--|  |  .-----. \n",n,' ');
+    printf("%*c|.  |___|  |  |  |  |__ --| \n",n,' ');
+    printf("%*c|.  |   |_____|__|__|_____| \n",n,' ');
+    printf("%*c|:  1   |         .--.--.-----. \n",n,' ');
+    printf("%*c|::.. . |         |  |  |__ --|_  \n",n,' ');
+    printf("%*c`-------'          \\___/|_____|__| \n",n,' ');
+    printf("%*c  _______ __    __              \n",n,' ');
+    printf("%*c |   _   |  |--|__.-----.-----. \n",n,' ');
+    printf("%*c |   1___|     |  |  _  |__ --| \n",n,' ');
+    printf("%*c |____   |__|__|__|   __|_____| \n",n,' ');
+    printf("%*c |:  1   |        |__|          \n",n,' ');
+    printf("%*c |::.. . | \n",n,' ');
+    printf("%*c `-------' \n",n,' ');
 
     gotoxy(60,45);
     printf("\e[5m");
     printf("Press 'Enter' to start!");
     printf("\e[25m");
+    //Venter på at brugeren trykker Enter
      while (1) {
         char str[4]={""};
         keyboardInput(str);

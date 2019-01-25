@@ -1,4 +1,3 @@
-
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -19,6 +18,7 @@
 
 
     // OBJEKTER:
+// Sætter objekter til døde, ved at printe mellemrum over dem og sætte relevante værdier i deres structs til 0.
 void death(struct velocityvector * deadObject){
     int xc;
     int yc;
@@ -121,7 +121,7 @@ void death(struct velocityvector * deadObject){
     }
 }
 
-
+// Giver startværdier til alle structs.
 void initObjects(struct velocityvector * ship,
                  struct velocityvector * shot0,
                  struct velocityvector * shot1,
@@ -309,10 +309,12 @@ void initObjects(struct velocityvector * ship,
         powerUp2->enabled=0;
 }
 
+//Giver startværdier for tutorial til alle structs.
 void initTutorial(struct velocityvector * ship,
                  struct velocityvector * shot0,
                  struct box * gameBox)
 {
+
  // De individuelle structs SKAL initialiseres i main(), men initObject() definerer elementer af structs'ne
 
    // SHIP
@@ -349,7 +351,7 @@ void initTutorial(struct velocityvector * ship,
 
 }
 
-
+// Giver startværdier for level 1 til alle structs.
 void initLevel1(struct velocityvector * ship,
                  struct velocityvector * shot0,
                  struct velocityvector * shot1,
@@ -528,6 +530,7 @@ void initLevel1(struct velocityvector * ship,
 
                 }
 
+// Giver startværdier for level 2 til alle structs.
 void initLevel2(struct velocityvector * ship,
                  struct velocityvector * shot0,
                  struct velocityvector * shot1,
@@ -706,6 +709,7 @@ void initLevel2(struct velocityvector * ship,
 
 }
 
+// Giver startværdier for level 3 til alle structs.
 void initLevel3(struct velocityvector * ship,
                  struct velocityvector * shot0,
                  struct velocityvector * shot1,
@@ -881,7 +885,9 @@ void initLevel3(struct velocityvector * ship,
 
 }
 
-void reviveSeagull(struct velocityvector * seagull,int x, int y, int vx, int vy){
+//Ida
+//Genopliver døde rumhavmåger
+void reviveSeagull(struct velocityvector * seagull,int x, int y, int vx, int vy) {
     if (seagull->alive==0){
         seagull->x=x;
         seagull->y=y;
@@ -894,12 +900,14 @@ void reviveSeagull(struct velocityvector * seagull,int x, int y, int vx, int vy)
 
     //ANIMATION AF OBJEKTER:
 
-
+//Jakob
+// shipControls benyttes til at styre skibet.
+//Sammenholder input fra brugeren med både rotations bevægelser, fremadrettet bevægelse og skud.
 void shipControls(char * str,struct velocityvector * ship,struct velocityvector * shot0,struct velocityvector * shot1,struct velocityvector * shot2, struct box * gameBox, struct velocityvector * powerUp0, struct velocityvector * powerUp1 , struct velocityvector * powerUp2) {
 // char str[4]={""};   <-- denne SKAL defineres i main
-    if (ship->alive>0){
 
-      //  if (keyboardInput(str)>0) {
+    //kører kun hvis skibet er i live
+    if (ship->alive>0){
 
             if (arrowInput(str)==4) { // venstre rotation af skib - venstre pil
                 ship->ang++;
@@ -915,131 +923,38 @@ void shipControls(char * str,struct velocityvector * ship,struct velocityvector 
             }
 
             if(arrowInput(str)==0x01){ // skyde  - spacebar
-               /* if (ship->x-2==asteroid->x+(asteroid->height-1)/2 && (ship->ang==7 || ship->ang==0 || ship->ang==1) ){
-                }
-                else if(ship->x+2==asteroid->x-(asteroid->height-1)/2 && (ship->ang==3 || ship->ang==4 || ship->ang==5) ) {
-                }
-                else if(ship->y-2==asteroid->y+(asteroid->width-1)/2 && (ship->ang==1 || ship->ang==2 || ship->ang==3) ) {
-                }
-                else if(ship->y+2==asteroid->y-(asteroid->width-1)/2 && (ship->ang==5 || ship->ang==6 || ship->ang==7) ) {
-                }
-                else { */
                     if(shot0->alive==0){
                         shoot(shot0,ship);
                     }
+                    //hvis powerUp er enabled aktiveres 2 skud mere.
                     else if (shot0->alive > 0 && powerUp0->enabled==1 && shot1->alive==0) {
                         shoot(shot1,ship);
                     }
                     else if (shot0->alive > 0 && shot1->alive>0 && powerUp0->enabled==1 && shot2->alive==0 ) {
                         shoot(shot2,ship);
                     }
-                //}
-
             }
-
-
             if (arrowInput(str)==16){ // flyv fremad - pil op
-
                 ship->enabled=1; // tjekker om skibet er ved at tilføre impuls
                 if ( (ship->ang==7 || ship->ang==0 || ship->ang==1)){
                     ship->impulseX--;
-                        //ship->vx=-1;
                 }
                 if (ship->ang==1 || ship->ang==2 || ship->ang==3) {
                     ship->impulseY--;
-                      //  ship->vy=-1;
                 }
                 if (ship->ang==3 || ship->ang==4 || ship->ang==5) {
                     ship->impulseX++;
-                       // ship->vx=1;
                 }
                 if (ship->ang==5 || ship->ang==6 || ship->ang==7) {
                         ship->impulseY++;
-                      //  ship->vy=1;
                 }
             }
-
-        //alt der står nedenunder er ført til ny funktion: moveShip(.....);
-
-         /*   //impuls fjernes med tid - 1 pr. 1/10 sekund
-            if (updateShip1(10)==1) {
-
-                if (ship->impulseX>0 && moved==0) {
-                    ship->impulseX--;
-                }
-                if (ship->impulseX<0 && moved==0) {
-                    ship->impulseX++;
-                }
-                if (ship->impulseY>0 && moved==0) {
-                    ship->impulseY--;
-                }
-                if (ship->impulseY<0 && moved==0) {
-                    ship->impulseY++;
-                }
-            } */
-
-            // sørger for at skibet ikke kan flyve ud af gameboxen
-          /*
-            if ((ship->x+ship->vx<=gameBox->x1+3 && (ship->ang==7 || ship->ang==0 || ship->ang==1)) || (ship->x+ship->vx<=gameBox->x1+2 && ship->impulseX<0) ){
-                ship->impulseX=0;
-            }
-            if((ship->x+ship->vx>=gameBox->x2-3 && (ship->ang==3 || ship->ang==4 || ship->ang==5)) ||  (ship->x+ship->vx>=gameBox->x2-2 && ship->impulseX>0) ) {
-                ship->impulseX=0;
-            }
-            if((ship->y+ship->vy<=gameBox->y1+3 && (ship->ang==1 || ship->ang==2 || ship->ang==3))  ||  (ship->y+ship->vy<=gameBox->y1+2 && ship->impulseY<0) ) {
-                ship->impulseY=0;
-            }
-            if((ship->y+ship->vy>=gameBox->y2-3 && (ship->ang==5 || ship->ang==6 || ship->ang==7) ) ||  (ship->y+ship->vy>=gameBox->y2-2 && ship->impulseY>0)) {
-                ship->impulseY=0;
-            } */
-
-
-          /*  // oversætter impulse til velocity
-            if (abs(ship->impulseX)>=1) {
-                    ship->vx=1*(ship->impulseX/abs(ship->impulseX));
-            }
-            if (abs(ship->impulseX)>=5) {
-                  ship->vx=2*(ship->impulseX/abs(ship->impulseX));
-            }
-            if (abs(ship->impulseX)>=10) {
-                //    ship->vx=2*(ship->impulseX/abs(ship->impulseX));
-                    ship->impulseX=10*(ship->impulseX/abs(ship->impulseX));
-            }
-
-            if (abs(ship->impulseY)>=1) {
-                    ship->vy=1*(ship->impulseY/abs(ship->impulseY));
-            }
-            if (abs(ship->impulseY)>=5) {
-                   ship->vy=2*(ship->impulseY/abs(ship->impulseY));
-            }
-            if (abs(ship->impulseY)>=10) {
-                   // ship->vy=2*(ship->impulseY/abs(ship->impulseY));
-                    ship->impulseY=10*(ship->impulseY/abs(ship->impulseY));
-            }
-            */
-
-          /*  //tegner og cleaner skibet
-            if (draw==1 || ship->impulseX!=0 || ship->impulseY!=0) {
-                if (updateShip2(5)==1) {
-                    updateVelocityVector(ship);
-                    cleanShip(ship);
-                    drawShip(ship);
-                    draw=0;
-                    moved=0;
-
-
-                } */
-
-
-            //}
-
-      //  }
-
-    //}
     }
 }
 
-
+//Ida
+// benyttes i tutorial til at rotere skibet.
+//sammenholder input fra brugeren med rotationsbevægelse, da man i første del af tutorial kun skal kunne rotere.
 int shipControlsTutorialTurn(char * str,struct velocityvector * ship) {
 // char str[4]={""};   <-- denne SKAL defineres i main
     int draw=0;
@@ -1067,7 +982,9 @@ int shipControlsTutorialTurn(char * str,struct velocityvector * ship) {
        }
 }
 
-
+//Ida
+// benyttes i tutorial til at registrere fremadrettet bevægelse af skibet.
+//sammenholder input fra brugeren med rotationsbevægelse og fremadrettet bevægelse, men returnerer kun 1 ved fremadrettet bevægelse.
 int shipControlsTutorialMove(char * str,struct velocityvector * ship) {
   if (keyboardInput(str)>0) {
 
@@ -1112,6 +1029,8 @@ int shipControlsTutorialMove(char * str,struct velocityvector * ship) {
   }
 }
 
+//Ida
+// benyttes i tutorial til at registrere skud af skibet.
 int shipControlsTutorialShoot(char * str,struct velocityvector * ship,struct velocityvector * shot){
     if (keyboardInput(str)>0) {
             if(arrowInput(str)==1){
@@ -1124,9 +1043,14 @@ int shipControlsTutorialShoot(char * str,struct velocityvector * ship,struct vel
     }
 }
 
+//Jakob
+//
 void moveShip(struct velocityvector * ship,struct box * gameBox) {
+            //Her benyttes en static variable, da den gamle værdi af angOld skal hentes, hver gang funktionen kører.
             static int angOld;
             // "friktion" fjerner impuls
+            //updateShip kører så skibets impuls kun opdateres hvert 10 del sekund. ship->enabled==0 skal undersøges, da denne værdi tjekker om piletasten holdes inde.
+            //Det ønskes kun at fratrække impuls, når piletasten er sluppet.
             if (updateShip1(10)==1 && ship->enabled==0) {
                 if (ship->time>0){
                     ship->time--;
@@ -1159,7 +1083,7 @@ void moveShip(struct velocityvector * ship,struct box * gameBox) {
                 ship->impulseY=0;
             }
 
-            // oversætter impulse til velocity
+            // oversætter impuls til velocity
             if (abs(ship->impulseX)>=1) {
                     ship->vx=1*(ship->impulseX/abs(ship->impulseX));
             }
@@ -1167,12 +1091,10 @@ void moveShip(struct velocityvector * ship,struct box * gameBox) {
                   ship->vx=2*(ship->impulseX/abs(ship->impulseX));
             }
             if (abs(ship->impulseX)>=10) {
-                //    ship->vx=2*(ship->impulseX/abs(ship->impulseX));
                     ship->impulseX=10*(ship->impulseX/abs(ship->impulseX));
             }
 
             if (abs(ship->impulseX)==0) {
-                //    ship->vx=2*(ship->impulseX/abs(ship->impulseX));
                     ship->vx=0;
             }
             if (abs(ship->impulseY)>=1) {
@@ -1182,25 +1104,23 @@ void moveShip(struct velocityvector * ship,struct box * gameBox) {
                    ship->vy=2*(ship->impulseY/abs(ship->impulseY));
             }
             if (abs(ship->impulseY)>=10) {
-                   // ship->vy=2*(ship->impulseY/abs(ship->impulseY));
                     ship->impulseY=10*(ship->impulseY/abs(ship->impulseY));
             }
-
+            //Hvis impulsen er 0, skal skibets hastighed også sættes til 0.
             if (abs(ship->impulseY)==0) {
-                   // ship->vy=2*(ship->impulseY/abs(ship->impulseY));
                     ship->vy=0;
             }
 
-
+            //Hvis der er impuls, skal skibets position opdateres (ud fra hastigheden).
             if (ship->impulseX!=0 || ship->impulseY!=0) {
                 if (updateShip2(5)==1) {
                     updateVelocityVector(ship);
                     cleanShip(ship);
                     drawShip(ship);
-                  //  printf("X %d ",ship->impulseX);
-                  // printf("Y %d ",ship->impulseY);
+
                 }
             }
+            //Tester om skibet er blevet drejet, således at skibet tegnes, når skibet drejes.
             if (ship->ang!=angOld) {
                 drawShip(ship);
                 angOld=ship->ang;
@@ -1209,61 +1129,57 @@ void moveShip(struct velocityvector * ship,struct box * gameBox) {
 
 }
 
-
+//Jesper
+//opdaterer positionen af inputtet ud fra hastigheden hvormed inputtet bevæger sig.
 void updateVelocityVector(struct  velocityvector * velovector){
 velovector->x = velovector->x+velovector->vx;
 velovector->y = velovector->y+velovector->vy;
 };
 
+//Jesper
+//Tegner et projektil på placeringen (x,y)
 void drawShot(int32_t x, int32_t y){
 gotoxy(x,y);
 printf("%s","o");
 }
 
+//Jakob og Jesper
+//Funktionen kalder en række andre funktioner, der styrer hvordan projektilet kommer til at bevæge sig.
 int moveShot(struct velocityvector * shot,struct box * gameBox,struct velocityvector * asteroidL,struct velocityvector * asteroidS){
     int32_t xo=shot->x;
     int32_t yo=shot->y;
 
-
-    if (shot->impulseX>=1) {
-            shot->vx=shot->impulseX/10;
-    }
-    if (shot->impulseX<=-1) {
-            shot->vx=shot->impulseX/10;
-    }
-    if (shot->impulseY>=1) {
-            shot->vy=shot->impulseY/10;
-    }
-    if (shot->impulseY<=-1) {
-            shot->vy=shot->impulseY/10;
-    }
-    if(shot->impulseX==0) {
-            shot->vx=0;
-    }
-    if(shot->impulseY==0) {
-            shot->vy=0;
-    }
-
-  /* impuls cap skal måske bruges til ikke overdreven gravity acceleartion
-     if (abs(shot->impulseX)>=40) {
-        //    shot->vx=2*(shot->impulseX/abs(shot->impulseX));
-            shot->impulseX=40*(shot->impulseX/abs(shot->impulseX));
-    }
-    if (abs(shot->impulseY)>=40) {
-            // shot->vy=2*(shot->impulseY/abs(shot->impulseY));
-            shot->impulseY=40*(shot->impulseY/abs(shot->impulseY));
-    }*/
-    if (shot->alive>0){
-
+ if (shot->alive>0){
+        //undersøger projektilets nuværende impuls og justerer hastigheden af projektilet ud fra denne.
+            if (shot->impulseX>=1) {
+                    shot->vx=shot->impulseX/10;
+            }
+            if (shot->impulseX<=-1) {
+                    shot->vx=shot->impulseX/10;
+            }
+            if (shot->impulseY>=1) {
+                    shot->vy=shot->impulseY/10;
+            }
+            if (shot->impulseY<=-1) {
+                    shot->vy=shot->impulseY/10;
+            }
+            if(shot->impulseX==0) {
+                    shot->vx=0;
+            }
+            if(shot->impulseY==0) {
+                    shot->vy=0;
+            }
+        // clearer projektilets position
             gotoxy(xo,yo);
             printf("%c",' ');
-
+        // Undersøger om projektilet har ramt gameboxen eller nogle af asteroiderne og fjerner et liv fra skuddet hvis dette er tilfældet
             if (detectBarrier(gameBox,shot)==1) {
                 shot->alive--;
             }
             if (detectAsteroid(shot,asteroidL)==1 || detectAsteroid(shot,asteroidS)==1) {
                 shot->alive--;
             }
+        //sætter skuddet til dødt hvis det ikke har flere liv eller time er blevet 0. Time parameteren skyldet at skuddet kan låses i kredsløb rundt om asteroiderne.
             if (shot->alive==0){
                 death(shot);
             }
@@ -1271,10 +1187,11 @@ int moveShot(struct velocityvector * shot,struct box * gameBox,struct velocityve
                 death(shot);
             }
             shot->time--;
-
+        //Såfremt skuddet er i live opdateres skuddets hastighed og det tegnes i sin nye position
             if (shot->alive>0){
                 updateVelocityVector(shot);
                 drawShot(shot->x,shot->y);
+                //returnerer 1 for kunne se hvornår bolden har rykket sig. (Kan være praktisk)
                 return 1;
             }
 
@@ -1284,51 +1201,41 @@ int moveShot(struct velocityvector * shot,struct box * gameBox,struct velocityve
     }
 };
 
+// Jakob
+//Funktionen kalder en række andre funktioner, der styrer hvordan mågen kommer til at bevæge sig.
 void moveSeagull(struct velocityvector * seagull, struct box * gameBox,struct velocityvector * asteroidL,struct velocityvector * asteroidS,struct velocityvector *powerUp){
+    //sørger for at seagull kun bliver opdateret, hvis den er i live.
     if (seagull->alive==1){
-             // for mågen behøves vy ikke, men kan være nødvendig for andre objekter.
+
             int32_t vxold=seagull->vx;// forrige hastighed gemmes så dan kan sammenlignes med den nye
-            int32_t vyold=seagull->vy;
-             // forrige hastighed gemmes så dan kan sammenlignes med den nye
-            // seagull->vy=vyold; kan ikke se hvorfor dette er her, har nok været en idé til at hotfikse grafik vs hitbox
+
             detectBarrier(gameBox,seagull);
             detectAsteroid(seagull,asteroidL);
             detectAsteroid(seagull,asteroidS);
             detectAsteroid(seagull,powerUp);
 
+            //sørger for at mågen kun skifter position når den har vingerne slået up.
             if (seagull->ani==1) {
                 updateVelocityVector(seagull);
             }
-            if (vxold==seagull->vx){ // på grund af bounce på væggene skal den kun cleane nå der ikke er sket en ændring i dens retning.
+
+            if (vxold==seagull->vx){ // på grund af bounce på væggene skal den kun cleane når der ikke er sket en ændring i dens x-retning.
                 cleanSeagull(seagull);
             }
             drawSeagull(seagull);
     }
 }
 
-void moveAsteroid(struct velocityvector * velovector){
-    int32_t xo;
-    int32_t yo;
-    updateVelocityVector(velovector);
-    if (velovector->width==5){
-            drawAsteroid(velovector);
-            cleanAsteroid(velovector);
-    }
-    else if (velovector->width==3){
-            drawAsteroid(velovector);
-            cleanAsteroid(velovector);
-    }
-};
-
 
     //INTERAKTION MELLEM OBJEKTER:
 
-
-//checkker om der skabes en collision i næste updatering, hvis ja, så skiftes fortegn på en overtrædende hastighed
+//Jesper
+//checkker om der skabes en collision mellem gamebox og input (velovector) i næste updatering, hvis ja, så skiftes fortegn på en overtrædende hastighed
 int detectBarrier(struct box * gameBox, struct velocityvector * velovector){
     int bounce=0;
-
+    // tjekker om input er en måge
     if (velovector->width==9){
+        //tjekker om der vil ske kollision ved næste update. Her skal der tages højde for height og width, da koordinatsættet i input structen er midtpunktet af figuren.
         if( velovector->x+velovector->vx-((velovector->height-1)/2)  <=  gameBox->x1 ){
                 velovector->vx=velovector->vx*(-1);
                 bounce=1;
@@ -1346,6 +1253,7 @@ int detectBarrier(struct box * gameBox, struct velocityvector * velovector){
                 bounce=1;
         }
     }
+    // tjekker om input er et projektil.
     else if(velovector->width == 1){
         if( velovector->x+velovector->vx  <=  gameBox->x1+1 ){
                 velovector->impulseX=velovector->impulseX*(-1);
@@ -1370,25 +1278,14 @@ int detectBarrier(struct box * gameBox, struct velocityvector * velovector){
     else return 0;
 }
 
+//Jakob
+//Tjekker om der skabes kollision mellem en asteroide og velovektor ved den næste opdatering. Hvis ja, så skiftes fortegnene på hastighed eller impuls af velovector.
 int detectAsteroid(struct velocityvector * velovector,struct velocityvector * asteroid){
     int bouncex=0;
     int bouncey=0;
+    //funktionen skal kun køre hvis inputtet (velovector) er i live.
     if (velovector->alive>0){
-       /* if (velovector->x+(velovector->height-1)/2 < asteroid->x+asteroid->vx-((asteroid->height-1)/2)
-             && velovector->x+velovector->vx+(velovector->height-1)/2  >=  asteroid->x+asteroid->vx-((asteroid->height-1)/2)
-            && (((velovector->y+velovector->vy+(velovector->width-1)/2 >= asteroid->y-((asteroid->width-1)/2))  ||  (velovector->y+velovector->vy-(velovector->width-1)/2 <= asteroid->y+((asteroid->width-1)/2))) && !((velovector->y+velovector->vy+(velovector->width-1)/2 >= asteroid->y-((asteroid->width-1)/2))  &&  (velovector->y+velovector->vy-(velovector->width-1)/2 <= asteroid->y+((asteroid->width-1)/2))))){
-                bouncex=1;
-        }
-        if (velovector->x-(velovector->height-1)/2 > asteroid->x+asteroid->vx+((asteroid->height-1)/2) && velovector->x+velovector->vx-(velovector->height-1)/2 <= asteroid->x+asteroid->vx+((asteroid->height-1)/2) && (velovector->y+velovector->vy+(velovector->width-1)/2 >= asteroid->y-((asteroid->width-1)/2)  ||  velovector->y+velovector->vy-(velovector->width-1)/2 <= asteroid->y+((asteroid->width-1)/2))){
-                bouncex=1;
-        }
-        if(velovector->y-(velovector->width-1)/2 < asteroid->y+asteroid->vy-((asteroid->width-1)/2) && velovector->y+velovector->vy+(velovector->width-1)/2  >=  asteroid->y+asteroid->vy-((asteroid->width-1)/2) && (velovector->x+velovector->vx+(velovector->height-1)/2 >= asteroid->x-((asteroid->height-1)/2)   ||   velovector->x+velovector->vx-(velovector->height-1)/2 <= asteroid->x+((asteroid->height-1)/2))){
-                bouncey=1;
-        }
-        if(velovector->y+(velovector->width-1)/2 > asteroid->y+asteroid->vy+((asteroid->width-1)/2) && velovector->y+velovector->vy+(velovector->width-1)/2  <=  asteroid->y+asteroid->vy+((asteroid->width-1)/2) && ( velovector->x+velovector->vx+(velovector->height-1)/2 >= asteroid->x-((asteroid->height-1)/2)   ||   velovector->x+velovector->vx-(velovector->height-1)/2 <= asteroid->x+((asteroid->height-1)/2))){
-                bouncey=1;
-        } */
-
+    // tjekker om der er sket en kollision og undersøger  velovektors position i forhold til asteroiden. For at undersøge i hvilken retning velovector skal bounce.
         if (detectCollision(velovector,asteroid)==1 && velovector->x<asteroid->x-(asteroid->height-1)/2){
             bouncex=1;
         }
@@ -1398,18 +1295,22 @@ int detectAsteroid(struct velocityvector * velovector,struct velocityvector * as
         if (detectCollision(velovector,asteroid)==1 && velovector->y<asteroid->y-(asteroid->height-1)/2){
             bouncey=1;
         }
-        if (detectCollision(velovector,asteroid)==1 && velovector->y>asteroid->y-(asteroid->height-1)/2){
+        else if (detectCollision(velovector,asteroid)==1 && velovector->y>asteroid->y-(asteroid->height-1)/2){
             bouncey=1;
         }
 
         if (bouncex==1) {
+                //ændrer retningen af impulsen i x retningen.
                 velovector->impulseX*=(-1);
+                // Mågerne har ingen impuls, men skal stadigvæk have skiftet fortegnet på deres hastighed, når de kolliderer med en asteoride.
                 if (velovector->impulseX==0 && velovector->impulseY==0){
                         velovector->vx*=(-1);
                 }
         }
         if (bouncey==1) {
+                //ændrer retningen af impulsen i y retningen.
                 velovector->impulseY*=(-1);
+                //mågerne får skiftet fortegnet på deres hastighed.
                 if (velovector->impulseX==0 && velovector->impulseY==0){
                         velovector->vy*=(-1);
                 }
@@ -1422,8 +1323,10 @@ int detectAsteroid(struct velocityvector * velovector,struct velocityvector * as
     else return 0;
 }
 
-
+//Jakob
+//Affyrer et projektil. Retning, position og impuls af skuddet bestemmes ud fra vinkel og position af inputtet ship
 void shoot(struct velocityvector * shot,struct velocityvector * ship) {
+    //reseter projektilets værdi, hvis det er dødt.
     if (shot->alive<1) {
     death(shot);
     int impulse=10;
@@ -1433,6 +1336,7 @@ void shoot(struct velocityvector * shot,struct velocityvector * ship) {
     shot->impulseY=0;
 
      // detect collisions med shot inden i, skal sætte shot->alive=0;
+    //tjekker vinklen af skibet, for at give projektilet impuls i den rigtige retning.
     if(ship->ang==0){
                 shot->x=ship->x-3;
                 shot->y=ship->y;
@@ -1484,29 +1388,34 @@ void shoot(struct velocityvector * shot,struct velocityvector * ship) {
 }
 }
 
+// Jakob og Jesper
+//Detekterer kollision mellem obj1 og obj2. Sætter parametre der svarer til de fire hjørner inputsne, obj1 og obj2 og undersøger overlap.
 int detectCollision(struct velocityvector * obj1,struct velocityvector * obj2){
 
     int hitx=0;
     int hity=0;
-
+    //øverste venstre hjørne af obj1
     int i1=(obj1->x+obj1->vx)-(obj1->height-1)/2;
     int j1=(obj1->y+obj1->vy)-(obj1->width-1)/2;
-
+    //nedeste højre hjørne af obj1
     int i2=i1+obj1->height;
     int j2=j1+obj1->width;
-
+    //øverste venstre hjørne af obj2
     int k1=(obj2->x+obj2->vx-((obj2->height-1)/2));
     int l1=(obj2->y+obj2->vy-((obj2->width-1)/2));
-
+    //nedeste højre hjørne af obj2.
     int k2=k1+obj2->height;
     int l2=l1+obj2->width;
 
+    // Undersøger om obj1's del i x ligger indenfor obj2.
     if (k2 > i1 && k1 < i2){
             hitx=1;
     }
+    // Undersøger om obj1's del i y ligger indenfor obj2.
     if (l2 > j1 && l1 < j2) {
             hity=1;
     }
+    // Hvis obj1 ligger indenfor intervallet af obj2 i både x og y, så er der en kollision og der returneres 1.
     if (hitx==1 && hity==1) {
         return 1;
     }
@@ -1516,10 +1425,14 @@ int detectCollision(struct velocityvector * obj1,struct velocityvector * obj2){
 
 }
 
+// Jakob og Jesper
+//kører detectCollision på et objekt og skibet.
 int detectCollsionShip( struct velocityvector * obj1,struct velocityvector * ship) {
+    //Her tjekkes det om obj1 og skibet kolliderer.
     if (detectCollision(obj1,ship)==1) {
         death(ship);
-       if (obj1->time>0){ //hvis det er et skud, og ikke en måge
+
+       if (obj1->time>0){ //hvis det er et skud, og ikke en måge. Måger har time=0.
             death(obj1);
        }
         return 1;
@@ -1529,10 +1442,13 @@ int detectCollsionShip( struct velocityvector * obj1,struct velocityvector * shi
     }
 }
 
+// Jekob og Jesper
+//kører detectCollision på et objekt og mågen.
 int detectCollisionSeagull( struct velocityvector * seagull ,struct velocityvector * obj1){
     if (seagull->alive > 0) {
         if (detectCollision(obj1,seagull)==1) {
             death(obj1);
+            //slår mågen ihjel netop hvis kollisionen er mellem måge og et projektil.
             if (obj1->width==1) {
                 death(seagull);
             }
@@ -1544,8 +1460,11 @@ int detectCollisionSeagull( struct velocityvector * seagull ,struct velocityvect
     }
 }
 
+// Jakob og Jesper
+//kører detectCollision på et objekt og en asteroide
 int detectCollsionAsteroid( struct velocityvector * obj1,struct velocityvector * asteroid) {
     if (detectCollision(obj1,asteroid)==1) {
+        //sætter det objekt der støder ind i asteroiden til dødt.
         death(obj1);
         return 1;
     }
@@ -1554,6 +1473,8 @@ int detectCollsionAsteroid( struct velocityvector * obj1,struct velocityvector *
     }
 }
 
+//Jakob
+//Aktiverer asteroidernes gravitation.
 void Gravity(struct velocityvector * shot, struct velocityvector * asteroid){
     //brug 32 for at undgå overflow. Vi har burg for at shifte for at opnå præccision når vi kigger på kredsløb.
     //afstand til asteroide
@@ -1563,63 +1484,34 @@ void Gravity(struct velocityvector * shot, struct velocityvector * asteroid){
 
    // int32_t countLimit=1<<13;
     if(shot->alive>0){
+    // afstand i hhv x og y mellem asteoride og skud
     int32_t dx=(asteroid->x-shot->x);
     int32_t dy=(asteroid->y-shot->y);
 
+    //  radial afstand i anden
     int32_t r = (sqrtI2I(dx*dx+dy*dy))*(sqrtI2I(dx*dx+dy*dy));
-    //(sqrtI2I(dx*dx))*(sqrtI2I(dx*dx));// *sqrtI2I(dx*dx+dy*dy));;
 
+    // Gravitations værdien bitshiftes for at gøre gravitationen kraftigere.
     int32_t G=asteroid->G*5;
-
- /*// Hvad vi gerne vil er at beregne en hastighedsændring som følge af asteroiden.  Dvs: v=v+Delta v
-    // Der beregnes en hastighedsændring i hhv. x og i y som følge af den store asteroide:
-    // Der shiftes med 15 pladser til højre svarende til at der divideres 2^15.
-    int32_t Dvx= ((dx/abs(dx))*G/(r))/abs(((dx/abs(dx))*G/(r))) ;
-    int32_t Dvy= ((dy/abs(dy))*G/(r))/abs(((dy/abs(dy))*G/(r))) ;
-
-         shot->vx = (shot->vx+Dvx);
-         shot->vy = (shot->vy+Dvy);                       */
-/*
-
-    int32_t Dvxold=Dvx;
-    int32_t Dvyold=Dvy;
- */
+    // Sætter en radius for den ring, hvor tyngdekraften skal virke indenfor.
     if (sqrtI2I(r)<=20) {
         dx=dx;
         dy=dy;
+        //tilvækst i hastighed i hhv x og y som følge af asteroidernes gravitationelle kraftpåvirkning.
         Dvx =  (dx/sqrtI2I(r))*(G/(r));
         Dvy =  (dy/sqrtI2I(r))*(G/(r));
 
+        //Hastighedsændringen lægges til projektilets impuls
         shot->impulseX += Dvx;
         shot->impulseY += Dvy;
     }
-    //hvis der skiftes fra postiv til negativ retning og vice versa i forhold til asteroiden.
-
-    /*
-    if (abs(Dvxold)>abs(Dvx) ){
-            Dvx=0;
-    }
-    if (abs(Dvyold)>abs(Dvy) ){
-            Dvy=0;
-    }
-    if (shot->alive <= 0 || r>1250000){ // tyngdepåvirkning resestes når skudet kommer langt nok væk
-            Dvx=0;
-            Dvy=0;
-    }
-
-    if (Dvx>=countLimit || Dvx<=-(countLimit)) {
-        shot->vx = (shot->vx+(Dvx/abs(Dvx)));
-        Dvx=0;
-    }
-    if (Dvy>=countLimit || Dvy<=-(countLimit)){
-        shot->vy = (shot->vy+(Dvy/abs(Dvy)));
-        Dvy=0;
-    } */
     }
 }
 
     //GRAFIK AF OBJEKTER:
 
+//Jakob
+//Tegner gameboxen som spillet foregår i
 void drawBox(struct box * gameBox) {
     int i;
     for (i=gameBox->y1; i<= gameBox->y2;  i++) {
@@ -1651,25 +1543,19 @@ void drawBox(struct box * gameBox) {
         gotoxy(i,gameBox->y2);
         printf("%c",186);        // vægge
     }
-
-    // skriver title
- /*
-    gotoxy(gameBox->x1,gameBox->y1+2);
-    printf("%c",185);
-    printf(" %s ", gameBox->title);
-    printf("%c",204);
-    gotoxy(1,1);
-    */
 }
 
-
+//Jakob
+//Tegner rumskibet
 void drawShip(struct velocityvector * ship) {
+        //Positionen for det øverste venstre hjørne af figuren hvorfra rumskibet tegnes.
         int xc=ship->x-1;
         int yc=ship->y-1;
     gotoxy(xc,yc);
     if (ship->time>0) {  //blinker kun når skip er i iFrames
        printf("\e[5m");
     }
+    //skibet tegnes forskelligt afhængigt af vinklen det er i.
     if (ship->ang==0) {
         printf("%c%c%c",' ',94,' ');
         gotoxy(xc+1,yc);
@@ -1729,11 +1615,13 @@ void drawShip(struct velocityvector * ship) {
     printf("\e[25m"); // slukker altid blink
 }
 
+//Jakob
+//Renser skibets tidligere position
 void cleanShip(struct velocityvector * ship) {
-
+    //beregner tidligere position (x,y) er altid midtpunktskoordinaterne af skibet.
     int xc=ship->x-ship->vx-1;
     int yc=ship->y-ship->vy-1;
-
+        //printer mellemrum i et felt der er 3x3, der hvor skibet var.
         gotoxy(xc,yc);
         printf("%*c",3,' ');
         gotoxy(xc+1,yc);
@@ -1743,8 +1631,10 @@ void cleanShip(struct velocityvector * ship) {
 
 }
 
-
+//Ida
+//Tegner asteroider
 void drawAsteroid(struct velocityvector * asteroid){
+    //tjekker om asteroiden er alive. Begge asteroider er ikke med i alle 3 levels.
     if (asteroid->alive==1) {
         if (asteroid->width==5){ // Asteroid size Large
             int xc=asteroid->x-2;
@@ -1773,94 +1663,17 @@ void drawAsteroid(struct velocityvector * asteroid){
     }
 }
 
-void cleanAsteroid(struct velocityvector * asteroid){ // ikke brugt da asteroider ike bevæger sig
-    int xold = asteroid->x-asteroid->vx;
-    int yold = asteroid->y-asteroid->vy;
-    int x,y;
-        if (asteroid->width==5){ // stor asteroide
-            if (asteroid->vy>0){
-                //Asteroiden bevæger sig i positiv y-putty retning (positiv x-retning)
-                //skal være 1 mindre end afstand fra massemidtpunkt, da den har bevæget sig 1 plads i y.
-                y=yold-2;
-                x=xold-1;
-                // asteroid->print blank
-                gotoxy(x,y);
-                printf("%c",' ');
-                gotoxy(x+1,y);
-                printf("%c",' ');
-                gotoxy(x+2,y);
-                printf("%c",' ');
-            }
-            else if (asteroid->vy<0){
-                //Asteroiden bevæger sig i negativ x-retning (y_putty) y skal være 1 større end afstand fra massemidtpunkt.
-                y=yold+2;
-                x=xold-1;
-                // print blank
-                gotoxy(x,y);
-                printf("%c",' ');
-                gotoxy(x+1,y);
-                printf("%c",' ');
-                gotoxy(x+2,y);
-                printf("%c",' ');
-            }
-            if (asteroid->vx>0){
-                //Asteroiden bevæger sig i positiv x-putty retning (positiv y-retning)
-                x=xold-1;
-                y=yold-2;
-                gotoxy(x,y);
-                printf("%*c",5,' ');
-            }
-            else if (asteroid->vx<0){
-            //Afstanden fra massemidpunkt til start tegneposition + 1 ekstra i x, da den bevæger sig denne vej.
-                x=xold+1;
-                y=yold-2;
-                gotoxy(x,y);
-            printf("%*c",5,' ');
-            }
-        }
-
-        else if (asteroid->width==3){
-            if (asteroid->vy>0){
-                    //Asteroiden bevæger sig i positiv y-putty retning (positiv x-retning)
-                    //y skal være 1 mindre end afstand fra massemidtpunkt, da den har bevæget sig 1 plads i y.
-                    x=xold;
-                    y=yold-1;
-                    gotoxy(x,y);
-                    printf("%c",' ');
-                }
-            else if (asteroid->vy<0){
-                    // Her bliver x og y til x og y
-                    x=xold;
-                    y=yold+1;
-                    gotoxy(x,y);
-                    printf("%c",' ');
-                }
-            if (asteroid->vx>0){
-                //Asteroiden bevæger sig i positiv x-putty retning (positiv y-retning)
-                //x skal være 1 mindre end afstand fra massemidtpunkt, da den har bevæget sig 1 plads i positiv x.
-                x=xold;
-                y=yold-1;
-                gotoxy(x,y);
-                printf("%*c",3,' ');
-            }
-            else if (asteroid->vx<0){
-                //Asteroiden bevæger sig i negativ x-retning (y_putty) x skal være 1 større end afstand fra massemidtpunkt.
-                x=xold;
-                y=yold-1;
-            gotoxy(x,y);
-            printf("%*c",3,' ');
-            }
-        }
-}
-
-
+//Ida
+// Tegner Rumhavmåger
 void drawSeagull(struct velocityvector * seagull){
+    //Koordinater af øverste venstre hjørne, hvorudfra mågen skal tegnes.
     int xc=seagull->x-1;
     int yc=seagull->y-4;
     if (seagull->alive==1){
+        //ani tjekker hvilken position mågen er i. ani=1 vingerne ude. ani=0 vingerne inde.
         if (seagull->ani==0){
             gotoxy(xc,yc);
-            // måge position står
+            // måge position vingerne inde
             printf("%c%c%c%c%c%c%c%c%c",' ',' ',47,92,' ',47,92,' ',' ');
             gotoxy(xc+1,yc);
             printf("%c%c%c%c%c%c%c%c%c",' ',35,' ',' ',153,' ',' ',35,' ');
@@ -1869,7 +1682,7 @@ void drawSeagull(struct velocityvector * seagull){
             seagull->ani=1;
         }
         else if (seagull->ani==1){
-            // måge position flyver
+            // måge position vingerne ude.
             gotoxy(xc,yc);
             printf("%c%c%c%c%c%c%c%c%c",' ',47,35,92,' ',47,35,92,' ');
             gotoxy(xc+1,yc);
@@ -1881,24 +1694,30 @@ void drawSeagull(struct velocityvector * seagull){
     }
 }
 
+//Jakob
+//renser mågens tidligere position.
 void cleanSeagull(struct velocityvector * seagull){
-    //  virker muligvis kun for hastigeder +- 1!!!
     int x;
     int y;
     if (seagull->vy > 0 || seagull->vy < 0){   //mågen bevæger sig i y-retning
-        y=seagull->y-(3+(seagull->vy/abs(seagull->vy))); // "3" 4+-vy, derfor divideres hastigheden abs(vy) for at få fortegnet.
+        // Der trækkes 3 fra for at komme til venstre side af figuren. Herefter lægges hastigheden til (med fortegn) for at tage højde for bevægelsesretning.
+        // Hastigheden divideres med abs(vy) for at bibeholde fortegnet og tage højde for at hastigheden kan være andet en 1.
+        y=seagull->y-(3+(seagull->vy/abs(seagull->vy)));
     }
     if (seagull->vx > 0 || seagull->vx < 0){   //mågen bevæger sig i x-retning
         x=seagull->x-(seagull->vx/abs(seagull->vx))*2; //fortegnet beregnes og ganges med (h-1)/2 =2
     }
     if (seagull->vx > 0 || seagull->vx < 0){
         gotoxy(x,y);
+        // Der behøves kun at renses 7 pladser, da mågens animation (vingerne inde), gør at den yderste plads i hver side automatisk renses.
         printf("%*c",7,' ');
     }
 }
 
-
+//Jesper
+// Tegner PowerUps
 void drawPowerUp(struct velocityvector * powerUp){
+    //Øverste venstre hjørne af kassen.
     int xc=powerUp->x-1;
     int yc=powerUp->y-1;
         gotoxy(xc,yc);
@@ -1909,9 +1728,12 @@ void drawPowerUp(struct velocityvector * powerUp){
         printf("%c%c%c",192,196,217);
 }
 
-
+//Jesper
+// detecterer at skibet har ramt en powerUp og aktiverer denne powerUp
 int enablePowerUp(struct velocityvector * ship, struct velocityvector * powerUp, int rgb[3]){
+    //tjekker om skibet er stødt sammen med powerUpen. Andet statement sørger for at funktionen ikke fortsætter så længe der detekteres en kollision.
     if(detectCollision(ship,powerUp)==1 && powerUp->enabled==0){
+        //Aktiverer lyd
         setFreq(880);
         for(int q=0; q<=1<<18;q++){
         }
@@ -1919,8 +1741,10 @@ int enablePowerUp(struct velocityvector * ship, struct velocityvector * powerUp,
         for(int q=0; q<=1<<18;q++){
         }
         setFreq(0);
+        //sætter enable værdien til 1, så powerUpen aktiveres.
         powerUp->enabled=1;
         death(powerUp);
+        //Sætter LED til grøn
         rgb[0]=0;
         rgb[1]=1;
         rgb[2]=0;
@@ -1931,10 +1755,5 @@ int enablePowerUp(struct velocityvector * ship, struct velocityvector * powerUp,
         return 0;
     }
 }
-
-
-
-
-
 
 

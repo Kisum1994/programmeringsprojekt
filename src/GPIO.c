@@ -32,8 +32,9 @@ int getS_() {return s_;}
 int getM() {return m;}
 int getH() {return h;}
 
-
-void initJoystick () {
+// Jakob, Ida og Jesper
+// Skriver til registers. Fortæller hvilke porte der skal aktiveres.
+void initJoystick (void) {
  RCC->AHBENR |= RCC_AHBPeriph_GPIOA;
  RCC->AHBENR |= RCC_AHBPeriph_GPIOB;
  RCC->AHBENR |= RCC_AHBPeriph_GPIOC;
@@ -79,16 +80,11 @@ void initJoystick () {
  /* Set push/pull register (0x00 - No pull, 0x01 - Pull-up, 0x02 - Pull-down) */
 }
 
-int8_t readJoystick () {
-/* skriv dette i main for at bruge
-    int j;
-    int i;
-    while (1){
-        readJoystick();
+// Jakob, Ida og Jesper
+//
+int8_t readJoystick (void) {
 
-    }
-    */
-
+    //Skriver til
     uint16_t valUp = GPIOA->IDR & (0x0001 << 4);
     uint16_t valNed = GPIOB->IDR & (0x0001 << 0);
     uint16_t valCenter = GPIOB->IDR & (0x0001 << 5);
@@ -131,7 +127,9 @@ int8_t readJoystick () {
     }
 }
 
-void initLED() {
+//Jakob, Ida og Jesper
+//
+void initLED(void) {
  RCC->AHBENR |= RCC_AHBPeriph_GPIOA;
  RCC->AHBENR |= RCC_AHBPeriph_GPIOB;
  RCC->AHBENR |= RCC_AHBPeriph_GPIOC;
@@ -183,6 +181,8 @@ void initLED() {
 
 }
 
+//Jakob og Jesper
+//
 void setLED(int rgb[3]) {
 
     GPIOA->ODR |= (0x0001 << 9); //Set pin PA9 to high = off
@@ -203,13 +203,14 @@ void setLED(int rgb[3]) {
     }
 }
 
-void LEDjoystick() {
+// Jakob
+//
+void LEDjoystick(void) {
  /* skriv dette i main for at bruge
     int j;
     int i;
     while (1){
         LEDjoystick();
-
     }
     */
     int valJ[3]={0,0,0};
@@ -253,7 +254,9 @@ void LEDjoystick() {
         }
 }
 
-void initTimer (){ // TIM 15
+// Jakob, Ida og Jesper.
+//
+void initTimer (void){ // TIM 15
  RCC->APB2ENR |= RCC_APB2Periph_TIM15; // Enable clock line to timer 2;
  TIM15->CR1 &= ~0x0001; // Configure timer 2
  TIM15->ARR = 63999; // Set reload value
@@ -264,10 +267,12 @@ void initTimer (){ // TIM 15
 // // TIM2->CR1 = 0x0001; --- start timer 2 -- skriv dette i main for at starte timeren
 }
 
+// Jesper
+//vi har ændret timeren?
 void TIM1_BRK_TIM15_IRQHandler(void){
         //Do whatever you want here, but make sure it doesn’t take too much time!
         // OMREGN TIL SEKUNDER! fra 1/100 dele sek
-        // dette er hvad der sker ved en interrupt i timer 2
+        // dette er hvad der sker ved en interrupt i timer 5
     if (time>=100) {
             s++;
             time -= 100;
@@ -280,6 +285,7 @@ void TIM1_BRK_TIM15_IRQHandler(void){
                 m=0;
             }
     }
+    //globale tidsvariable der opdateres hver gang der foretages en interrupt.
     time++;
     tmpship1++;
     tmpship2++;
@@ -293,7 +299,9 @@ void TIM1_BRK_TIM15_IRQHandler(void){
 
 }
 
-void initBuzzer(){
+//Jesper
+
+void initBuzzer(void){
      RCC->APB1ENR |= 0x00000001; // Enable clock line to timer 2;
      TIM2->CR1 = 0x0000; // Disable timer
      TIM2->ARR = 0x03e7; // Set auto reload value
@@ -315,6 +323,8 @@ void initBuzzer(){
 
 }
 
+//Jesper
+//
 void setFreq(uint16_t freq) {
      uint32_t reload = 64e6 / freq / (0x027f + 1) - 1;
      TIM2->ARR = reload; // Set auto reload value
@@ -322,24 +332,22 @@ void setFreq(uint16_t freq) {
      TIM2->EGR |= 0x01;
 }
 
-
+//Jakob, Ida og Jesper
+//
 int8_t get_char(char * text, int length) {
 
     /* INDSÆT SÅLEDES I MAIN: HVIS MAN F.EKS. VIL PRINTE DEN INDTASTEDE STRING. !man behøver ikke at printe stringen!
     Der defineres en string  str[length+1] main som man "overskriver" ved hjælp af get_char når get_char har ændret str vil den returne 1
-
     uart_clear();
     char str[4];  <-- defineret string der ændres af get_char
-
     while (1) {
-
         if (get_char(str, 3)>0) {
             printf("%s",str);
         }
     }*/
 
-
-    static int buffCount=0; //Husk at forklare static variable i rapport
+    //Static variabel, da der ønskes at skrive til den gamle værdi af buffcount. Static variable gør at den husker sin placering (værdi fra før)
+    static int buffCount=0;
 
 
     if (buffCount<length) {
@@ -364,6 +372,8 @@ int8_t get_char(char * text, int length) {
     return 0;
 }
 
+// Ida og Jakob
+//Reseter følgende globale tidsvariable.
 void resetWatch(void){
     time=0;
     s=0;
@@ -372,7 +382,8 @@ void resetWatch(void){
 }
 
 
-void PCtimer (int * input) { // stopur der kan kontrolleres med get_char og userInput funktionerne. Brug userInput(readKeyboard()) som input.
+// stopur der kan kontrolleres med get_char og userInput funktionerne. Brug userInput(readKeyboard()) som input.
+void PCtimer (int * input) {
 
                     if (input[0]==0x10) {  // tænder ur
                         TIM2->CR1 = 0x0001;
@@ -410,8 +421,10 @@ void PCtimer (int * input) { // stopur der kan kontrolleres med get_char og user
                     }
 }
 
-int userInput(char * str) { // til keyboard styring af PCtimer();
-    // brug den som input til PCtimer(); i et while loop i main
+//
+// til keyboard styring af PCtimer();
+// brug den som input til PCtimer(); i et while loop i main
+int userInput(char * str) {
 
         if (strcmp(str,"start")==0) {
             return 0x10;
@@ -433,10 +446,11 @@ int userInput(char * str) { // til keyboard styring af PCtimer();
         }
 }
 
-
-int8_t keyboardInput(char * text) {  // SKAL MÅSKE IKKE LIGGE I GPIO.c
-    // fungerer som get_char(); men har en grænse på 3 karakterer for piletasterne
-    static uint8_t buffCount=0; //Husk at forklare static variable i rapport
+//Jakob
+// fungerer som get_char(); men har en grænse på 3 karakterer for piletasterne
+int8_t keyboardInput(char * text) {
+    //Static variabel, da der ønskes at skrive til den gamle værdi af buffcount. Static variable gør at den husker sin placering (værdi fra før)
+    static uint8_t buffCount=0;
     if (buffCount<3) {
         if (0<uart_get_count()) {
             text[buffCount]=uart_get_char();
@@ -470,10 +484,8 @@ int8_t keyboardInput(char * text) {  // SKAL MÅSKE IKKE LIGGE I GPIO.c
     }
 }
 
-
-
-
-
+//Ida og Jakob
+//
 void lcd_write_string(uint8_t * buffer, char * str,int locationLine,int numberLine){
     int i=0;
     int j=0;
@@ -490,6 +502,8 @@ void lcd_write_string(uint8_t * buffer, char * str,int locationLine,int numberLi
     }
 }
 
+//Ida og Jakob
+//
 void lcd_update(uint8_t * buffer, char * str){
     static int i=0;
     static int j=0;
@@ -506,7 +520,8 @@ void lcd_update(uint8_t * buffer, char * str){
     i++;
 }
 
-
+//Jakob
+//
 int arrowInput(char * str) {  // keypoardInput bliver oversat til HEX-tal
 // char str[4]={""};   <-- denne SKAL defineres i main
 
@@ -538,8 +553,13 @@ int arrowInput(char * str) {  // keypoardInput bliver oversat til HEX-tal
         }
 }
 
-
+//Ida
+/*Funktioner til at kontrollere hastigheden af måger og skud.
+Her er flere styks hvilket skyldes at den globale tidsvariable resetes hver gang den respektive update funktion køres.
+Ønskes det at have flere objekter med forskellige hastigheder, skal der derfor bruges flere stort set identiske funktioner.
+(ens på nær forskellige globale tidsvariable)*/
 int updateSeagull1(int speed) {
+    //tmpseagull sættes til 0, hver gang værdien af speed nås.
     if ( tmpseagull1 >= speed ){
         tmpseagull1 = 0;
         return 1;
@@ -550,6 +570,7 @@ int updateSeagull1(int speed) {
 }
 
 int updateSeagull2(int speed) {
+    //tmpseagul2 sættes til 0, hver gang værdien af speed nås.
     if ( tmpseagull2 >= speed ){
         tmpseagull2 = 0;
         return 1;

@@ -9,7 +9,6 @@
    Last changed by:    $Author: $
    Last changed date:  $Date:  $
    ID:                 $Id:  $
-
 **********************************************************************/
 
 #include <stdlib.h>
@@ -25,15 +24,15 @@
 #include "objects.h"
 #include "interface.h"
 
-/*  // burg af globale variable: indsæt getTime(); istedet for for time variable i main,
+/*  // burg af globale variable: indsæt getTime(); istedet for tids-variable i main,
      getTime();
      getTime_();
      getS();
      getS_();
      getM();
      getH();
-
     */
+
 
 
 int main(void) {
@@ -93,9 +92,7 @@ int main(void) {
      drawBox(&gameBox);
         moveAsteroid(&asteroidS);
         moveAsteroid(&asteroidL);
-
         drawShip(&ship);
-
         drawPowerUp(&powerUp0);
  */
     printf("BETA : Everything you see is subject to change.\n");
@@ -169,7 +166,7 @@ while (1) {
                 if(shipControlsTutorialShoot(str2,&ship,&shot0)==1){
                     shotFired++;
                 }
-                moveShot(&shot0,&gameBox,3);
+                moveShot(&shot0,&gameBox,&asteroidL,&asteroidS);
                 if (detectCollsionShip(&shot0,&ship)==1){
                     drawShip(&ship);
                 }
