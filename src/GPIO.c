@@ -24,7 +24,7 @@
     int tmpshot2;
 
 
-
+// henter de globale variabler så de kan bruges andre steder end i GPIO.c
 int getTime() {return time;}
 int getTime_() {return time_;}
 int getS() {return s;}
@@ -81,10 +81,10 @@ void initJoystick (void) {
 }
 
 // Jakob, Ida og Jesper
-//
+//læser på de porte man har bedt joysticken sende til og definere valJ ud fra det.
 int8_t readJoystick (void) {
 
-    //Skriver til
+    //Hvilek porte vi gerne vil læse fra.
     uint16_t valUp = GPIOA->IDR & (0x0001 << 4);
     uint16_t valNed = GPIOB->IDR & (0x0001 << 0);
     uint16_t valCenter = GPIOB->IDR & (0x0001 << 5);
@@ -92,7 +92,7 @@ int8_t readJoystick (void) {
     uint16_t valVenstre = GPIOC->IDR & (0x0001 << 1);
     int8_t valJ;
     int i=0;
-
+        //sætter værdier afhængig af joystickets output.
         if (valUp > 0 && i==0) {
             valJ= 0x01;
             i=1;
@@ -128,7 +128,7 @@ int8_t readJoystick (void) {
 }
 
 //Jakob, Ida og Jesper
-//
+//skriver til registers og aktivere de porte vi er interesserede i at bruge.
 void initLED(void) {
  RCC->AHBENR |= RCC_AHBPeriph_GPIOA;
  RCC->AHBENR |= RCC_AHBPeriph_GPIOB;
@@ -182,7 +182,7 @@ void initLED(void) {
 }
 
 //Jakob og Jesper
-//
+//skriver til registers og aktivere de porte vi er interesserede i at bruge.
 void setLED(int rgb[3]) {
 
     GPIOA->ODR |= (0x0001 << 9); //Set pin PA9 to high = off
@@ -204,7 +204,7 @@ void setLED(int rgb[3]) {
 }
 
 // Jakob
-//
+//omskriver et array til afhængig joystickets output, sådan at det kan bruges i setLED funktionen.
 void LEDjoystick(void) {
  /* skriv dette i main for at bruge
     int j;
@@ -216,6 +216,7 @@ void LEDjoystick(void) {
     int valJ[3]={0,0,0};
     int j=0;
     int i=0;
+    // her sættes de porte vi er interesserede i at læse værdierne fra
     uint16_t valUp = GPIOA->IDR & (0x0001 << 4);
     uint16_t valNed = GPIOB->IDR & (0x0001 << 0);
     uint16_t valCenter = GPIOB->IDR & (0x0001 << 5);
@@ -248,14 +249,14 @@ void LEDjoystick(void) {
             i=0;
         }
 
-        if (i!=j) {
+        if (i!=j) { // i!=j er en gate der sørger for at der kun bliver sendt output en gang for hver joystick-ændring.
             setLED(valJ);
             j = i;
         }
 }
 
 // Jakob, Ida og Jesper.
-//
+//skriver til TIM 15 registers, at den skal ku bruges som timer med interrupt hvert hundrededel sekund.
 void initTimer (void){ // TIM 15
  RCC->APB2ENR |= RCC_APB2Periph_TIM15; // Enable clock line to timer 2;
  TIM15->CR1 &= ~0x0001; // Configure timer 2
@@ -267,8 +268,8 @@ void initTimer (void){ // TIM 15
 // // TIM2->CR1 = 0x0001; --- start timer 2 -- skriv dette i main for at starte timeren
 }
 
-// Jesper
-//vi har ændret timeren?
+// Jakob
+//Denne beskriver hvad der skal ske ved hver interrupt. Her sættes den til at tælle en værdi op, og derfra beregne sekunder, minutter og timer, samt tælle andre globale værdier.
 void TIM1_BRK_TIM15_IRQHandler(void){
         //Do whatever you want here, but make sure it doesn’t take too much time!
         // OMREGN TIL SEKUNDER! fra 1/100 dele sek
@@ -300,7 +301,7 @@ void TIM1_BRK_TIM15_IRQHandler(void){
 }
 
 //Jesper
-
+// skriver til registers så vi kan bruge buzzeren, dette foregår vha. af TIM2
 void initBuzzer(void){
      RCC->APB1ENR |= 0x00000001; // Enable clock line to timer 2;
      TIM2->CR1 = 0x0000; // Disable timer
@@ -324,7 +325,7 @@ void initBuzzer(void){
 }
 
 //Jesper
-//
+//Sætter buzzeren til at spille en tone med inputtet som frekvensen af tonen.
 void setFreq(uint16_t freq) {
      uint32_t reload = 64e6 / freq / (0x027f + 1) - 1;
      TIM2->ARR = reload; // Set auto reload value
@@ -333,11 +334,12 @@ void setFreq(uint16_t freq) {
 }
 
 //Jakob, Ida og Jesper
-//
+//Henter værdi, svarene til et keypress, fra en FIFO buffer og skriver den til en predefineret string.
 int8_t get_char(char * text, int length) {
 
     /* INDSÆT SÅLEDES I MAIN: HVIS MAN F.EKS. VIL PRINTE DEN INDTASTEDE STRING. !man behøver ikke at printe stringen!
     Der defineres en string  str[length+1] main som man "overskriver" ved hjælp af get_char når get_char har ændret str vil den returne 1
+    EKS:
     uart_clear();
     char str[4];  <-- defineret string der ændres af get_char
     while (1) {
@@ -352,11 +354,11 @@ int8_t get_char(char * text, int length) {
 
     if (buffCount<length) {
         if (0<uart_get_count()) {
-            text[buffCount]=uart_get_char();
+            text[buffCount]=uart_get_char(); // henter tast fra bufferen og skriver den til ønskede postionen i stringen
             buffCount++;
         }
-        if (text[buffCount-1]==0x0d) {
-            buffCount--;
+        if (text[buffCount-1]==0x0d) { // hvis den forrige tast var enter, afslutter den stringen man er ved at skrive.
+            buffCount--;                // Den sætter også denne 0x00 for at afslutte stringen.
             text[buffCount]=0x00;
             buffCount = 0;
             return 1;
@@ -364,9 +366,9 @@ int8_t get_char(char * text, int length) {
         }
     }
     if(buffCount==length){
-        text[buffCount]=0x00;
+        text[buffCount]=0x00; //stringen får 0x00 i enden når lænden er opnået.
         buffCount = 0;
-        return 1;
+        return 1; // ved return af 1 kan vi stoppe et while loop, og herfra bruge stringen.
         uart_clear();
     }
     return 0;
@@ -381,7 +383,7 @@ void resetWatch(void){
     h=0;
 }
 
-
+//Jakob
 // stopur der kan kontrolleres med get_char og userInput funktionerne. Brug userInput(readKeyboard()) som input.
 void PCtimer (int * input) {
 
@@ -423,7 +425,7 @@ void PCtimer (int * input) {
 
 //
 // til keyboard styring af PCtimer();
-// brug den som input til PCtimer(); i et while loop i main
+// Denne sammenligner string skrevet af get_char og returner en værdi afhægnig af den. (brug den som input til PCtimer(); i et while loop i main)
 int userInput(char * str) {
 
         if (strcmp(str,"start")==0) {
@@ -485,15 +487,15 @@ int8_t keyboardInput(char * text) {
 }
 
 //Ida og Jakob
-//
+//omsrkiver en uint8 array (hvert element svarer til de 8 pixels der er fra top til bund i en linje på LCD) afhængig af input stringen
 void lcd_write_string(uint8_t * buffer, char * str,int locationLine,int numberLine){
     int i=0;
     int j=0;
-
-    while (str[i]!=0x00) {
+    // der køres igennem et while loop der henter int8 tal fra en tabel og sætter dem på den korrekte position i bufferen
+    while (str[i]!=0x00) { // tjekker hvornår stringen er slut ved at tjekke for værdien 0x00
             for (j=0;j<5;j++) {
                int L =(i*5+j)+locationLine+128*numberLine;
-               if (L>512){
+               if (L>512){ // starter tekst der løber ud af enden af LCD fra starte igen
                     L-=512;
                }
                 buffer[(i*5+j)+locationLine+128*numberLine] = character_data[str[i]-0x20][j];
@@ -503,17 +505,17 @@ void lcd_write_string(uint8_t * buffer, char * str,int locationLine,int numberLi
 }
 
 //Ida og Jakob
-//
+//hver gang denne køres flyttet indeholdet af LCD bufferen en pixel mod højre på LCD'en.
 void lcd_update(uint8_t * buffer, char * str){
     static int i=0;
     static int j=0;
     if (i==50) {
-        memset(buffer,0x00,512);
+        memset(buffer,0x00,512); //clear bufferen og skriver den samme buffer til LCD'en en pixel forksudt.
         lcd_push_buffer(buffer);
         lcd_write_string(buffer,str,j,0);
         i-=50;
         j++;
-        if (j==512){
+        if (j==512){ // hvis den ryger ud over kanten, starter den forefra på LCD'en
                 j=0;
         }
     }
@@ -521,7 +523,7 @@ void lcd_update(uint8_t * buffer, char * str){
 }
 
 //Jakob
-//
+//læser et output fra keyboardInput og oversætter det til videre brug.
 int arrowInput(char * str) {  // keypoardInput bliver oversat til HEX-tal
 // char str[4]={""};   <-- denne SKAL defineres i main
 
